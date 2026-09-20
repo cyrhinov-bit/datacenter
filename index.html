@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="fr" id="html-root">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Processus de Digitalisation du Système de Santé - DISD Côte d'Ivoire</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            style: {
+              bg: '#f0f3f6',
+              white: '#ffffff',
+              red: '#dc141e',
+              teal: '#007a87',
+              orange: '#f5500a',
+              green: '#3ca532',
+              dark: '#102a38',
+              border: '#dbe2ea',
+              muted: '#64748b'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'Segoe UI', 'Roboto', 'sans-serif'],
+            display: ['Outfit', 'Inter', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@600;700;800;900&display=swap');
+    
+    body {
+      background-color: #f0f3f6;
+      color: #102a38;
+      overflow: hidden;
+      user-select: none;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Style.jpeg Capsule Pill Styling */
+    .capsule-pill {
+      border-radius: 9999px;
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 6px 16px -3px rgba(0, 0, 0, 0.1), 0 3px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    .capsule-pill:hover {
+      transform: translateY(-2px) scale(1.008);
+      box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.18);
+    }
+
+    .capsule-vertical {
+      border-radius: 28px;
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      box-shadow: 0 6px 16px -3px rgba(0, 0, 0, 0.1);
+    }
+    .capsule-vertical:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.18);
+    }
+
+    .photo-card {
+      background: #ffffff;
+      border: 1px solid #dbe2ea;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.08);
+      transition: all 0.35s ease;
+    }
+    .photo-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 30px -6px rgba(0, 122, 135, 0.2);
+      border-color: #007a87;
+    }
+
+    .pill-red { background: linear-gradient(135deg, #e60000 0%, #c40000 100%); }
+    .pill-teal { background: linear-gradient(135deg, #008796 0%, #006672 100%); }
+    .pill-orange { background: linear-gradient(135deg, #ff570a 0%, #e04400 100%); }
+    .pill-green { background: linear-gradient(135deg, #44b33a 0%, #2f8e26 100%); }
+    .pill-dark { background: linear-gradient(135deg, #163647 0%, #0c202b 100%); }
+
+    .circle-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 9999px;
+      background-color: #ffffff;
+      color: #102a38;
+      font-weight: 800;
+      font-size: 1.15rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .central-hub {
+      background: #ffffff;
+      border: 4px solid #007a87;
+      box-shadow: 0 15px 35px -5px rgba(0, 122, 135, 0.25), 0 8px 15px -4px rgba(0, 0, 0, 0.08);
+      border-radius: 9999px;
+    }
+
+    /* Animation Steps */
+    .slide-item {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .slide-item.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .slide-item.from-left { transform: translateX(-35px); }
+    .slide-item.from-left.revealed { transform: translateX(0); }
+    .slide-item.from-right { transform: translateX(35px); }
+    .slide-item.from-right.revealed { transform: translateX(0); }
+    .slide-item.zoom-in { transform: scale(0.92); }
+    .slide-item.zoom-in.revealed { transform: scale(1); }
+
+    /* Canvas background */
+    #bg-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.25;
+    }
+  </style>
+</head>
+<body class="w-screen h-screen flex flex-col justify-between relative overflow-hidden bg-style-bg">
+
+  <!-- Background Particle Network -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- Header Institutionnel -->
+  <header class="relative z-20 w-full px-8 py-3 flex items-center justify-between border-b border-style-border bg-white/90 backdrop-blur-md shadow-sm">
+    <div class="flex items-center space-x-4">
+      <img src="assets/logo_sante.png" alt="Ministère de la Santé" class="h-10 object-contain rounded bg-white shadow-sm p-1 border border-slate-200">
+      <div class="h-6 w-px bg-slate-300"></div>
+      <img src="assets/logo_disd.png" alt="DISD" class="h-10 object-contain bg-white shadow-sm p-1 rounded border border-slate-200">
+      <div class="hidden md:block">
+        <span class="text-xs font-bold uppercase tracking-wider text-style-teal">Ministère de la Santé, de l'Hygiène Publique et de la CMU</span>
+        <span class="text-xs block text-slate-500">Direction de l'Informatique et de la Santé Digitale (DISD)</span>
+      </div>
+    </div>
+
+    <!-- Controls & Auto-play -->
+    <div class="flex items-center space-x-3">
+      <button id="autoplay-btn" onclick="toggleAutoPlay()" class="px-3.5 py-1.5 rounded-full bg-style-green/10 hover:bg-style-green/20 border border-style-green/30 text-style-green transition flex items-center space-x-1.5 text-xs font-bold shadow-sm" title="Activer / Arrêter la lecture automatique (Touche A)">
+        <i id="autoplay-icon" data-lucide="play" class="w-3.5 h-3.5 text-style-green"></i>
+        <span id="autoplay-text">Lecture Auto</span>
+      </button>
+
+      <select id="speed-select" onchange="changeSpeed(this.value)" class="bg-white text-slate-700 border border-slate-300 text-xs rounded-full px-3 py-1.5 outline-none font-semibold cursor-pointer shadow-sm">
+        <option value="1500">Rapide (1.5s)</option>
+        <option value="2500" selected>Normal (2.5s)</option>
+        <option value="4000">Détaillé (4.0s)</option>
+      </select>
+
+      <span id="slide-indicator" class="px-3.5 py-1 rounded-full text-xs font-mono font-bold bg-style-teal/10 text-style-teal border border-style-teal/30">
+        01 / 15
+      </span>
+
+      <button onclick="toggleFullscreen()" class="p-2 rounded-full bg-white hover:bg-slate-100 text-slate-600 transition border border-slate-300 shadow-sm" title="Plein écran (Touche F)">
+        <i data-lucide="maximize" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Slide Viewport -->
+  <main id="slide-container" class="relative z-10 flex-1 w-full max-w-7xl mx-auto px-6 py-4 flex items-center justify-center">
+    <!-- Rendered dynamically -->
+  </main>
+
+  <!-- Footer Navigation -->
+  <footer class="relative z-20 w-full px-8 py-3 flex items-center justify-between border-t border-style-border bg-white/90 backdrop-blur-md shadow-sm">
+    <div class="text-xs font-semibold text-slate-600 flex items-center space-x-2">
+      <span class="inline-block w-2.5 h-2.5 rounded-full bg-style-teal animate-pulse"></span>
+      <span id="slide-topic-name">Processus de Digitalisation</span>
+    </div>
+
+    <div class="flex items-center space-x-3">
+      <button onclick="prevStep()" class="px-4 py-1.5 rounded-full bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 transition flex items-center space-x-1 text-xs font-semibold shadow-sm">
+        <i data-lucide="chevron-left" class="w-4 h-4"></i>
+        <span>Précédent</span>
+      </button>
+      <button onclick="nextStep()" class="px-5 py-1.5 rounded-full bg-style-teal hover:bg-teal-700 text-white font-bold transition flex items-center space-x-1 text-xs shadow-md">
+        <span>Suivant</span>
+        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+      </button>
+    </div>
+
+    <div class="text-xs text-slate-500 hidden md:flex items-center space-x-3">
+      <span><kbd class="px-2 py-0.5 rounded bg-slate-100 border border-slate-300 text-slate-700 text-[10px] font-mono">A</kbd> : Auto-play</span>
+      <span><kbd class="px-2 py-0.5 rounded bg-slate-100 border border-slate-300 text-slate-700 text-[10px] font-mono">→</kbd> : Suivant</span>
+      <span><kbd class="px-2 py-0.5 rounded bg-slate-100 border border-slate-300 text-slate-700 text-[10px] font-mono">F</kbd> : Plein écran</span>
+    </div>
+  </footer>
+
+  <!-- Top Progress Bar -->
+  <div class="absolute top-0 left-0 w-full h-1.5 bg-slate-200 z-50">
+    <div id="progress-bar" class="h-full bg-gradient-to-r from-style-red via-style-teal to-style-green progress-fill" style="width: 6.66%;"></div>
+  </div>
+
+  <script>
+    const slides = [
+      // SLIDE 1: Title
+      {
+        id: 1,
+        title: "Page de Garde",
+        steps: 5,
+        render: () => `
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center w-full">
+            <div class="lg:col-span-7 space-y-5">
+              <div class="slide-item step-1 inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-style-teal/10 border border-style-teal/30 text-style-teal text-xs font-bold uppercase tracking-wider">
+                <i data-lucide="activity" class="w-3.5 h-3.5"></i>
+                <span>Transformation Numérique de la Santé</span>
+              </div>
+              
+              <div class="space-y-1">
+                <h1 class="slide-item step-2 text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-style-dark leading-tight font-display">
+                  PROCESSUS DE <span class="text-style-red">DIGITALISATION</span>
+                </h1>
+                <p class="slide-item step-2 text-xl sm:text-2xl text-style-teal font-bold">
+                  du système de santé en Côte d’Ivoire
+                </p>
+              </div>
+
+              <div class="slide-item step-3 w-20 h-1.5 bg-style-red rounded-full"></div>
+
+              <div class="slide-item step-4 space-y-2 pt-2">
+                <div class="text-xs font-bold uppercase tracking-widest text-slate-500">Présenté par :</div>
+                <div class="text-lg font-extrabold text-style-dark flex items-center space-x-2">
+                  <span class="w-3 h-3 rounded-full bg-style-red"></span>
+                  <span>M. OUATTARA Yacouba</span>
+                </div>
+                <div class="slide-item step-5 text-sm text-slate-600 flex flex-col space-y-0.5 pl-4 border-l-2 border-style-teal">
+                  <span class="font-bold text-style-teal">Ingénieur Informaticien</span>
+                  <span class="text-slate-500 font-medium">Direction de l’Informatique et de la Santé Digitale (DISD)</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="lg:col-span-5 slide-item step-1 space-y-3">
+              <div class="capsule-pill pill-red px-4 py-3 flex items-center space-x-3 text-white">
+                <div class="circle-badge text-style-red">1</div>
+                <div>
+                  <div class="font-black text-sm uppercase tracking-wider">Datacenter National</div>
+                  <div class="text-xs text-white/90">Haute disponibilité, résilience & sécurité</div>
+                </div>
+              </div>
+              <div class="capsule-pill pill-teal px-4 py-3 flex items-center space-x-3 text-white">
+                <div class="circle-badge text-style-teal">2</div>
+                <div>
+                  <div class="font-black text-sm uppercase tracking-wider">Écosystème SNIS</div>
+                  <div class="text-xs text-white/90">DHIS2, SIGDEP3, OpenELIS connectés</div>
+                </div>
+              </div>
+              <div class="capsule-pill pill-orange px-4 py-3 flex items-center space-x-3 text-white">
+                <div class="circle-badge text-style-orange">3</div>
+                <div>
+                  <div class="font-black text-sm uppercase tracking-wider">Chaîne Médicale & DPI</div>
+                  <div class="text-xs text-white/90">E-SIGL, M-Supply, UPID et dossier patient</div>
+                </div>
+              </div>
+              <div class="capsule-pill pill-green px-4 py-3 flex items-center space-x-3 text-white">
+                <div class="circle-badge text-style-green">4</div>
+                <div>
+                  <div class="font-black text-sm uppercase tracking-wider">Gouvernance & Impact</div>
+                  <div class="text-xs text-white/90">Pilotage décisionnel et soins optimisés</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+
+      // SLIDE 2: Introduction
+      {
+        id: 2,
+        title: "Introduction",
+        steps: 5,
+        render: () => `
+          <div class="w-full space-y-6">
+            <div class="text-center space-y-1">
+              <span class="px-3.5 py-1 rounded-full bg-style-teal/10 text-style-teal text-xs font-bold uppercase tracking-wider">01 | CONTEXTE STRATÉGIQUE</span>
+              <h2 class="text-3xl font-extrabold text-style-dark font-display">INTRODUCTION</h2>
+            </div>
+
+            <div class="slide-item step-1 bg-white rounded-2xl p-4 border-2 border-style-teal text-center max-w-3xl mx-auto shadow-md">
+              <p class="text-base sm:text-lg text-style-dark font-medium">
+                <span class="px-2.5 py-0.5 rounded-full bg-style-red text-white font-bold text-xs mr-1">Depuis 2021</span>, 
+                le MSHPCMU accélère l’intégration du numérique dans le <strong class="text-style-teal">Système National d'Information Sanitaire (SNIS)</strong>.
+              </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+              <div class="slide-item step-2 capsule-pill pill-red p-4 flex items-center space-x-4 text-white">
+                <div class="circle-badge text-style-red">1</div>
+                <div>
+                  <h3 class="font-extrabold text-base uppercase tracking-wider">Qualité des Données</h3>
+                  <p class="text-xs text-white/90">Améliorer l'exhaustivité, la promptitude et la fiabilité des statistiques.</p>
+                </div>
+              </div>
+
+              <div class="slide-item step-3 capsule-pill pill-teal p-4 flex items-center space-x-4 text-white">
+                <div class="circle-badge text-style-teal">2</div>
+                <div>
+                  <h3 class="font-extrabold text-base uppercase tracking-wider">Prise de Décision</h3>
+                  <p class="text-xs text-white/90">Faciliter le pilotage basé sur des indicateurs fiables en temps réel.</p>
+                </div>
+              </div>
+
+              <div class="slide-item step-4 capsule-pill pill-orange p-4 flex items-center space-x-4 text-white">
+                <div class="circle-badge text-style-orange">3</div>
+                <div>
+                  <h3 class="font-extrabold text-base uppercase tracking-wider">Prise en Charge</h3>
+                  <p class="text-xs text-white/90">Fluidifier le parcours patient et optimiser les soins dans les établissements.</p>
+                </div>
+              </div>
+
+              <div class="slide-item step-5 capsule-pill pill-green p-4 flex items-center space-x-4 text-white">
+                <div class="circle-badge text-style-green">4</div>
+                <div>
+                  <h3 class="font-extrabold text-base uppercase tracking-wider">Modernisation</h3>
+                  <p class="text-xs text-white/90">Pérenniser et moderniser durablement le système d'information sanitaire.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+
+      // SLIDE 3: Le Datacenter
+      {
+        id: 3,
+        title: "Le Datacenter",
+        steps: 5,
+        render: () => `
+          <div class="w-full space-y-4">
+            <div class="text-center space-y-1">
+              <span class="px-3.5 py-1 rounded-full bg-style-teal/10 text-style-teal text-xs font-bold uppercase tracking-wider">02 | CŒUR TECHNIQUE</span>
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-style-dark font-display">LE DATACENTER</h2>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center max-w-5xl mx-auto pt-2">
+              <div class="lg:col-span-4 flex flex-col items-center justify-center slide-item step-1">
+                <div class="central-hub w-48 h-48 flex flex-col items-center justify-center text-center p-4">
+                  <span class="text-2xl mb-1">🖥️</span>
+                  <div class="font-black text-lg uppercase tracking-wider text-style-dark leading-tight">Datacenter</div>
+                  <div class="text-[11px] font-bold text-style-teal mt-0.5">Santé Digitale CI</div>
+                </div>
+              </div>
+
+              <div class="lg:col-span-8 space-y-3">
+                <div class="slide-item step-2 capsule-pill pill-red px-5 py-3 flex items-center space-x-4 text-white">
+                  <div class="circle-badge text-style-red">1</div>
+                  <div>
+                    <h4 class="font-black text-sm uppercase tracking-wider">Centraliser les Données</h4>
+                    <p class="text-xs text-white/90">Entrepôt unifié mettant fin au cloisonnement des informations de santé.</p>
+                  </div>
+                </div>
+
+                <div class="slide-item step-3 capsule-pill pill-teal px-5 py-3 flex items-center space-x-4 text-white">
+                  <div class="circle-badge text-style-teal">2</div>
+                  <div>
+                    <h4 class="font-black text-sm uppercase tracking-wider">Sécuriser les Informations</h4>
+                    <p class="text-xs text-white/90">Confidentialité, chiffrement, haute résilience et conformité SSI.</p>
+                  </div>
+                </div>
+
+                <div class="slide-item step-4 capsule-pill pill-orange px-5 py-3 flex items-center space-x-4 text-white">
+                  <div class="circle-badge text-style-orange">3</div>
+                  <div>
+                    <h4 class="font-black text-sm uppercase tracking-wider">Systèmes Intégrés</h4>
+                    <p class="text-xs text-white/90">Interopérabilité fluide entre hôpitaux, cliniques et laboratoires.</p>
+                  </div>
+                </div>
+
+                <div class="slide-item step-5 capsule-pill pill-green px-5 py-3 flex items-center space-x-4 text-white">
+                  <div class="circle-badge text-style-green">4</div>
+                  <div>
+                    <h4 class="font-black text-sm uppercase tracking-wider">Moderniser les Outils</h4>
+                    <p class="text-xs text-white/90">Applications web/mobiles performantes au service des praticiens.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+
+      // SLIDE 4: Politique de Digitalisation
+      {
+        id: 4,
+        title: "Politique de Digitalisation",
+        steps: 5,
+        render: () => `
+          <div class="w-full space-y-6">
+            <div class="text-center space-y-1">
+              <span class="px-3.5 py-1 rounded-full bg-style-teal/10 text-style-teal text-xs font-bold uppercase tracking-wider">03 | VISION SECTORIELLE</span>
+              <h2 class="text-3xl font-extrabold text-style-dark font-display">POLITIQUE DE DIGITALISATION</h2>
+              <p class="text-sm text-slate-600">La digitalisation concerne à la fois l’administration et l’offre de soins.</p>
+            </div>
+
+            <div class="slide-item step-1 max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-3 items-center">
+              <div class="capsule-pill pill-dark px-4 py-2.5 text-center text-white font-bold text-xs uppercase flex items-center justify-center space-x-2">
+                <span class="circle-badge !w-6 !h-6 !text-xs text-style-dark">A</span>
+                <span>Administration</span>
+              </div>
+              <div class="bg-white rounded-full py-2 px-4 border-2 border-style-red text-center font-black text-xs text-style-red uppercase shadow-sm">
+                ⚡ Convergence ⚡
+              </div>
+              <div class="capsule-pill pill-teal px-4 py-2.5 text-center text-white font-bold text-xs uppercase flex items-center justify-center space-x-2">
+                <span class="circle-badge !w-6 !h-6 !text-xs text-style-teal">B</span>
+                <span>Offre de Soins</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
+              <div class="slide-item step-2 capsule-vertical pill-red p-5 text-white flex flex-col items-center text-center">
+                <div class="circle-badge text-style-red mb-3">1</div>
+                <h4 class="font-black text-sm uppercase mb-1">Projets & Apps</h4>
+                <p class="text-xs text-white/90">Déploiement des logiciels métiers hospitaliers.</p>
+              </div>
+
+              <div class="slide-item step-3 capsule-vertical pill-teal p-5 text-white flex flex-col items-center text-center">
+                <div class="circle-badge text-style-teal mb-3">2</div>
+                <h4 class="font-black text-sm uppercase mb-1">Sécurité des SI</h4>
+                <p class="text-xs text-white/90">Politique PSSI, audits et cyberdéfense.</p>
+              </div>
+
+              <div class="slide-item step-4 capsule-vertical pill-orange p-5 text-white flex flex-col items-center text-center">
+                <div class="circle-badge text-style-orange mb-3">3</div>
+                <h4 class="font-black text-sm uppercase mb-1">Archivage</h4>
+                <p class="text-xs text-white/90">Gestion électronique (GED) et conformité légale.</p>
+              </div>
+
+              <div class="slide-item step-5 capsule-vertical pill-green p-5 text-white flex flex-col items-center text-center">
+                <div class="circle-badge text-style-green mb-3">4</div>
+                <h4 class="font-black text-sm uppercase mb-1">Données</h4>
+                <p class="text-xs text-white/90">Consolidation nationale pour un pilotage continu.</p>
+              </div>
+            </div>
+          </div>
+        `
+      },
+
+      // SLIDE 5: Transformation du SNIS
+      {
+        id: 5,
+        title: "Transformation du SNIS",
+        steps: 4,
+        render: () => `
+          <div class="w-full space-y-6">
+            <div class="text-center space-y-1">
+              <span class="px-3.5 py-1 rounded-full bg-style-teal/10 text-style-teal text-xs font-bold uppercase tracking-wider">04 | ÉCOSYSTÈME APPLICATIF</span>
+              <h2 class="text-3xl font-extrabold text-style-dark font-display">TRANSFORMATION DU SNIS</h2>
+            </div>
+
+            <div class="slide-item step-1 bg-white rounded-full px-6 py-2.5 border-2 border-style-teal text-center max-w-2xl mx-auto shadow-sm">
+              <p class="text-xs sm:text-sm text-style-dark font-bold">
+                🎯 Des informations : <span class="text-style-red">Disponibles</span> • <span class="text-style-teal">Fiables</span> • <span class="text-style-green">À temps</span>
+              </p>
+            </div>
+
+            <div class="space-y-3 max-w-4xl mx-auto">
+              <div class="slide-item step-2 capsule-pill pill-red px-5 py-3.5 flex items-center space-x-4 text-white">
+                <div class="circle-badge text-style-red">1</div>
+                <div class="flex-1">
+                  <div class="flex items-center justify-between">
+                    <h3 class="font-black text-base uppercase font-mono">DHIS2</h3>
+                    <span class="text-[10px] uppercase font-bold bg-white/20 px-2.5 py-0.5 rounded-full">Statistiques</span>
+                  </div>
+                  <p class="text-xs text-white/90">Collecte et analyse globale des données sanitaires et indicateurs nationaux.</p>
+                </div>
+              </div>
+
+              <div class="slide-item step-3 capsule-pill pill-teal px-5 py-3.5 flex items-center space-x-4 text-white">
+                <div class="circle-badge text-style-teal">2</div>
+                <div class="flex-1">
+                  <div class="flex items-center justify-between">
+                    <h3 class="font-black text-base uppercase font-mono">SIGDEP3</h3>
+                    <span class="text-[10px] uppercase font-bold bg-white/20 px-2.5 py-0.5 rounded-full">Patients VIH</span>
+                  </div>
+                  <p class="text-xs text-white/90">Suivi clinique et biologique individualisé des patients sous traitement ARV.</p>
+                </div>
+              </div>
+
+              <div class="slide-item step-4 capsule-pill pill-green px-5 py-3.5 flex items-center space-x-4 text-white">
+                <div class="circle-badge text-style-green">3</div>
+                <div class="flex-1">
+                  <div class="flex items-center justify-between">
+                    <h3 class="font-black text-base uppercase font-mono">OPENELIS</h3>
+                    <span class="text-[10px] uppercase font-bold bg-white/20 px-2.5 py-0.5 rounded-full">Laboratoires</span>
+                  </div>
+                  <p class="text-xs text-white/90">Gestion informatisée des laboratoires médicaux et du circuit des échantillons.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+
+      // SLIDE 6: Autres Solutions Numériques
+      {
+        id: 6,
+        title: "Autres Solutions Numériques",
+        steps: 3,
+        render: () => `
+          <div class="w-full space-y-6">
+            <div class="text-center space-y-1">
+              <span class="px-3.5 py-1 rounded-full bg-style-teal/10 text-style-teal text-xs font-bold uppercase tracking-wider">05 | COMPLÉMENTARITÉ DES OUTILS</span>
+              <h2 class="text-3xl font-extrabold text-style-dark font-display">AUTRES SOLUTIONS NUMÉRIQUES</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+              <div class="slide-item step-1 capsule-pill pill-red p-4 flex items-center space-x-4 text-white">
+                <div class="circle-badge text-style-red">1</div>
+                <div>
+                  <h4 class="font-black text-base uppercase font-mono">E-SIGL</h4>
+                  <p class="text-xs text-white/90">Gestion logistique intégrée des pharmacies et intrants stratégiques.</p>
+                </div>
+              </div>
+
+              <div class="slide-item step-1 capsule-pill pill-teal p-4 flex items-center space-x-4 text-white">
+                <div class="circle-badge text-style-teal">2</div>
+                <div>
+                  <h4 class="font-black text-base uppercase font-mono">M-SUPPLY</h4>
+                  <p class="text-xs text-white/90">Gestion des stocks et traçabilité de la dispensation des médicaments.</p>
+                </div>
+              </div>
+
+              <div class="slide-item step-2 capsule-pill pill-orange p-4 flex items-center space-x-4 text-white">
+                <div class="circle-badge text-style-orange">3</div>
+                <div>
+                  <h4 class="font-black text-base uppercase font-mono">UPID</h4>
+                  <p class="text-xs text-white/90">Identifiant Unique du Patient pour l'unicité et le suivi longitudinal.</p>
+                </div>
+              </div>
+
+              <div class="slide-item step-2 capsule-pill pill-green p-4 flex items-center space-x-4 text-white">
+                <div class="circle-badge text-style-green">4</div>
+                <div>
+                  <h4 class="font-black text-base uppercase font-mono">DPI</h4>
+                  <p class="text-xs text-white/90">Dossier Patient Informatisé pour la continuité des soins et l'historique partagé.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="slide-item step-3 text-center max-w-2xl mx-auto bg-white rounded-full py-2 px-5 border border-style-border text-xs text-slate-700 font-semibold shadow-sm">
+              💡 Des solutions complémentaires au service de la transformation numérique.
+            </div>
+          </div>
+        `
+      },
+
+      // SLIDE 7: Mise en Œuvre du Datacenter
+      {
+        id: 7,
+        title: "Mise en Œuvre du Datacenter",
+        steps: 4,
+        render: () => `
+          <div class="w-full space-y-6">
+            <div class="text-center space-y-1">
+              <span class="px-3.5 py-1 rounded-full bg-style-teal/10 text-style-teal text-xs font-bold uppercase tracking-wider">06 | SOCLE D'INFRASTRUCTURE</span>
+              <h2 class="text-3xl font-extrabold text-style-dark font-display">MISE EN ŒUVRE DU DATACENTER</h2>
+            </div>
+
+            <div class="slide-item step-1 bg-white rounded-3xl p-6 border-2 border-style-teal text-center max-w-4xl mx-auto shadow-md">
+              <div class="text-3xl mb-2">🖥️</div>
+              <h3 class="text-xl font-black text-style-dark mb-1">INFRASTRUCTURE NATIONALE DE SANTÉ</h3>
+              <p class="text-xs text-slate-600 max-w-2xl mx-auto mb-6">
+                « Mettre en place une infrastructure centralisée, sécurisée et performante pour accompagner la transformation numérique du système de santé. »
+              </p>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
+                <div class="slide-item step-2 capsule-pill pill-red p-4 flex items-center space-x-3 text-white">
+                  <div class="circle-badge text-style-red">1</div>
+                  <div>
+                    <h4 class="font-black text-sm uppercase">CENTRALISÉ</h4>
+                    <p class="text-[11px] text-white/90">Consolidation unifiée</p>
+                  </div>
+                </div>
+
+                <div class="slide-item step-3 capsule-pill pill-teal p-4 flex items-center space-x-3 text-white">
+                  <div class="circle-badge text-style-teal">2</div>
+                  <div>
+                    <h4 class="font-black text-sm uppercase">SÉCURISÉ</h4>
+                    <p class="text-[11px] text-white/90">Résilience & PSSI</p>
+                  </div>
+                </div>
+
+                <div class="slide-item step-4 capsule-pill pill-green p-4 flex items-center space-x-3 text-white">
+                  <div class="circle-badge text-style-green">3</div>
+                  <div>
+                    <h4 class="font-black text-sm uppercase">PERFORMANT</h4>
+                    <p class="text-[11px] text-white/90">Disponibilité 24/7</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+
+      // SLIDE 8: Chronologie de mise en œuvre
+      {
+        id: 8,
+        title: "Chronologie de mise en œuvre",
+        steps: 5,
+        render: () => `
+          <div class="w-full space-y-6">
+            <div class="text-center space-y-1">
+              <span class="px-3.5 py-1 rounded-full bg-style-teal/10 text-style-teal text-xs font-bold uppercase tracking-wider">07 | FEUILLE DE ROUTE (2021 - 2024)</span>
+              <h2 class="text-3xl font-extrabold text-style-dark font-display">CHRONOLOGIE DE MISE EN ŒUVRE</h2>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
+              <div class="slide-item step-1 capsule-vertical pill-red p-5 text-white flex flex-col items-center text-center">
+                <div class="circle-badge text-style-red mb-3">1</div>
+                <h4 class="font-black text-base uppercase mb-1">2021 — Cadrage</h4>
+                <p class="text-xs text-white/90">Signature des contrats et passation des marchés.</p>
+                <div class="text-[10px] uppercase font-bold bg-white/20 px-3 py-1 rounded-full mt-4">Phase : Préparation</div>
+              </div>
+
+              <div class="slide-item step-2 capsule-vertical pill-teal p-5 text-white flex flex-col items-center text-center">
+                <div class="circle-badge text-style-teal mb-3">2</div>
+                <h4 class="font-black text-base uppercase mb-1">2022 — Travaux</h4>
+                <p class="text-xs text-white/90">Génie civil, énergie, climatisation & baies IT.</p>
+                <div class="text-[10px] uppercase font-bold bg-white/20 px-3 py-1 rounded-full mt-4">Phase : Réalisation</div>
+              </div>
+
+              <div class="slide-item step-3 capsule-vertical pill-orange p-5 text-white flex flex-col items-center text-center">
+                <div class="circle-badge text-style-orange mb-3">3</div>
+                <h4 class="font-black text-base uppercase mb-1">2023 — Recette</h4>
+                <p class="text-xs text-white/90">Recette d'usine, tests de charge & validation.</p>
+                <div class="text-[10px] uppercase font-bold bg-white/20 px-3 py-1 rounded-full mt-4">Phase : Validation</div>
+              </div>
+
+              <div class="slide-item step-4 capsule-vertical pill-green p-5 text-white flex flex-col items-center text-center">
+                <div class="circle-badge text-style-green mb-3">4</div>
+                <h4 class="font-black text-base uppercase mb-1">2024 — Service</h4>
+                <p class="text-xs text-white/90">Réception provisoire et exploitation active.</p>
+                <div class="text-[10px] uppercase font-bold bg-white/20 px-3 py-1 rounded-full mt-4">Phase : Exploitation</div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+
+      // SLIDE 9: Le Datacenter en Images (REAL PHOTOS!)
+      {
+        id: 9,
+        title: "Le Datacenter en Images",
+        steps: 4,
+        render: () => `
+          <div class="w-full space-y-5">
+            <div class="text-center space-y-1">
+              <span class="px-3.5 py-1 rounded-full bg-style-teal/10 text-style-teal text-xs font-bold uppercase tracking-wider">08 | VISITE VIRTUELLE DU SITE</span>
+              <h2 class="text-3xl font-extrabold text-style-dark font-display">LE DATACENTER EN IMAGES</h2>
+            </div>
+
+            <!-- 3 Real Photo Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-6xl mx-auto">
+              <!-- Photo 1: datacenter1.png -->
+              <div class="slide-item step-1 photo-card flex flex-col justify-between">
+                <div class="h-52 w-full overflow-hidden bg-slate-100 relative group">
+                  <img src="assets/datacenter1.png" alt="Salle Serveurs Datacenter" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                </div>
+                <div class="p-3">
+                  <div class="capsule-pill pill-red px-3.5 py-2 flex items-center space-x-3 text-white">
+                    <div class="circle-badge text-style-red !w-7 !h-7 !text-xs">1</div>
+                    <div>
+                      <div class="font-black text-xs uppercase">Salle Serveurs & Baies IT</div>
+                      <div class="text-[10px] text-white/90">Racks haute densité APC/Schneider</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Photo 2: datacenter4.png -->
+              <div class="slide-item step-2 photo-card flex flex-col justify-between">
+                <div class="h-52 w-full overflow-hidden bg-slate-100 relative group">
+                  <img src="assets/datacenter4.png" alt="Énergie et Groupes Electrogènes" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                </div>
+                <div class="p-3">
+                  <div class="capsule-pill pill-teal px-3.5 py-2 flex items-center space-x-3 text-white">
+                    <div class="circle-badge text-style-teal !w-7 !h-7 !text-xs">2</div>
+                    <div>
+                      <div class="font-black text-xs uppercase">Énergie & Groupes Kohler</div>
+                      <div class="text-[10px] text-white/90">Groupes SDMO 165 kVA redondants</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Photo 3: datacenter2.png -->
+              <div class="slide-item step-3 photo-card flex flex-col justify-between">
+                <div class="h-52 w-full overflow-hidden bg-slate-100 relative group">
+                  <img src="assets/datacenter2.png" alt="Supervision et Monitoring" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                </div>
+                <div class="p-3">
+                  <div class="capsule-pill pill-green px-3.5 py-2 flex items-center space-x-3 text-white">
+                    <div class="circle-badge text-style-green !w-7 !h-7 !text-xs">3</div>
+                    <div>
+                      <div class="font-black text-xs uppercase">Supervision & Monitoring</div>
+                      <div class="text-[10px] text-white/90">Schneider & Cogitech 24/7</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="slide-item step-4 text-center max-w-2xl mx-auto bg-white rounded-full py-2 px-5 border border-style-border text-xs text-slate-700 font-semibold shadow-sm">
+              💡 Une infrastructure au cœur de la centralisation et de la sécurisation des données de santé.
+            </div>
+          </div>
+        `
+      },
+
+      // SLIDE 10: Infrastructure technique (REAL PHOTOS!)
+      {
+        id: 10,
+        title: "Infrastructure technique",
+        steps: 4,
+        render: () => `
+          <div class="w-full space-y-5">
+            <div class="text-center space-y-1">
+              <span class="px-3.5 py-1 rounded-full bg-style-teal/10 text-style-teal text-xs font-bold uppercase tracking-wider">09 | ÉQUIPEMENTS TECHNIQUES DE POINTE</span>
+              <h2 class="text-3xl font-extrabold text-style-dark font-display">INFRASTRUCTURE TECHNIQUE DU DATACENTER</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-6xl mx-auto">
+              <!-- Equipment 1: datacenter1.png -->
+              <div class="slide-item step-1 photo-card flex flex-col justify-between">
+                <div class="h-48 w-full overflow-hidden bg-slate-100 relative group">
+                  <img src="assets/datacenter1.png" alt="Baies IT & Confinement" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                </div>
+                <div class="p-3">
+                  <div class="capsule-pill pill-red px-3.5 py-2 flex items-center space-x-3 text-white">
+                    <div class="circle-badge text-style-red !w-7 !h-7 !text-xs">1</div>
+                    <div>
+                      <div class="font-black text-xs uppercase">Puissance de Calcul & Baies</div>
+                      <div class="text-[10px] text-white/90">Confinement InRow Cooling APC</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Equipment 2: datacenter3.png -->
+              <div class="slide-item step-2 photo-card flex flex-col justify-between">
+                <div class="h-48 w-full overflow-hidden bg-slate-100 relative group">
+                  <img src="assets/datacenter3.png" alt="Aéroréfrigérants externes" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                </div>
+                <div class="p-3">
+                  <div class="capsule-pill pill-teal px-3.5 py-2 flex items-center space-x-3 text-white">
+                    <div class="circle-badge text-style-teal !w-7 !h-7 !text-xs">2</div>
+                    <div>
+                      <div class="font-black text-xs uppercase">Climatisation Externe</div>
+                      <div class="text-[10px] text-white/90">Aéroréfrigérants redondants de précision</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Equipment 3: datacenter4.png -->
+              <div class="slide-item step-3 photo-card flex flex-col justify-between">
+                <div class="h-48 w-full overflow-hidden bg-slate-100 relative group">
+                  <img src="assets/datacenter4.png" alt="Groupes électrogènes secours" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                </div>
+                <div class="p-3">
+                  <div class="capsule-pill pill-green px-3.5 py-2 flex items-center space-x-3 text-white">
+                    <div class="circle-badge text-style-green !w-7 !h-7 !text-xs">3</div>
+                    <div>
+                      <div class="font-black text-xs uppercase">Continuité Électrique</div>
+                      <div class="text-[10px] text-white/90">Automates de bascule & secours Kohler</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="slide-item step-4 text-center max-w-3xl mx-auto bg-white rounded-full py-2.5 px-6 border border-style-border text-xs text-slate-700 font-semibold shadow-sm">
+              « Des équipements conçus pour assurer la disponibilité, la sécurité et la performance des systèmes numériques de santé. »
+            </div>
+          </div>
+        `
+      },
+
+      // SLIDE 11: Une infrastructure au service de la santé digitale (REAL PHOTO LEFT!)
+      {
+        id: 11,
+        title: "Au service de la santé digitale",
+        steps: 4,
+        render: () => `
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center w-full max-w-6xl mx-auto">
+            <!-- Left Large Real Photo Card -->
+            <div class="lg:col-span-5 slide-item step-1">
+              <div class="photo-card p-3 space-y-3">
+                <div class="h-72 w-full rounded-2xl overflow-hidden bg-slate-100 relative">
+                  <img src="assets/datacenter_slide_11_image_3.png" alt="Salle Serveurs & Sécurité Datacenter" class="w-full h-full object-cover">
+                </div>
+                <div class="text-center px-2 py-1">
+                  <div class="font-black text-xs uppercase text-style-dark">🛡️ Salle Serveurs & Extinction Gaz Inerte</div>
+                  <div class="text-[10px] text-slate-500 mt-0.5">Contrôle d'accès sécurisé & protection incendie</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="lg:col-span-7 space-y-3">
+              <div class="slide-item step-2 space-y-1">
+                <span class="px-3.5 py-1 rounded-full bg-style-teal/10 text-style-teal text-xs font-bold uppercase tracking-wider">10 | VALEUR AJOUTÉE</span>
+                <h2 class="text-2xl font-extrabold text-style-dark font-display">AU SERVICE DE LA SANTÉ DIGITALE</h2>
+              </div>
+
+              <div class="slide-item step-3 capsule-pill pill-red px-5 py-3.5 flex items-center space-x-4 text-white">
+                <div class="circle-badge text-style-red">1</div>
+                <div>
+                  <h4 class="font-black text-sm uppercase">Centralisation</h4>
+                  <p class="text-xs text-white/90">Unification des bases de données sanitaires nationales.</p>
+                </div>
+              </div>
+
+              <div class="slide-item step-4 capsule-pill pill-teal px-5 py-3.5 flex items-center space-x-4 text-white">
+                <div class="circle-badge text-style-teal">2</div>
+                <div>
+                  <h4 class="font-black text-sm uppercase">Sécurisation</h4>
+                  <p class="text-xs text-white/90">Chiffrement et conformité stricte aux règles de cybersécurité.</p>
+                </div>
+              </div>
+
+              <div class="slide-item step-4 capsule-pill pill-green px-5 py-3.5 flex items-center space-x-4 text-white">
+                <div class="circle-badge text-style-green">3</div>
+                <div>
+                  <h4 class="font-black text-sm uppercase">Performance</h4>
+                  <p class="text-xs text-white/90">Temps d'accès instantanés pour les professionnels de santé.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+
+      // SLIDE 12: Défis et Perspectives
+      {
+        id: 12,
+        title: "Défis et perspectives",
+        steps: 6,
+        render: () => `
+          <div class="w-full space-y-5">
+            <div class="text-center space-y-1">
+              <span class="px-3.5 py-1 rounded-full bg-style-teal/10 text-style-teal text-xs font-bold uppercase tracking-wider">11 | ENJEUX STRATÉGIQUES</span>
+              <h2 class="text-3xl font-extrabold text-style-dark font-display">DÉFIS ET PERSPECTIVES</h2>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 max-w-6xl mx-auto pt-2">
+              <div class="slide-item step-2 capsule-vertical pill-red p-4 text-white flex flex-col items-center text-center">
+                <div class="circle-badge text-style-red mb-2">1</div>
+                <h4 class="font-black text-xs uppercase mb-1">Ressources Humaines</h4>
+                <p class="text-[11px] text-white/90">Recrutement et fidélisation d'experts IT.</p>
+              </div>
+
+              <div class="slide-item step-3 capsule-vertical pill-teal p-4 text-white flex flex-col items-center text-center">
+                <div class="circle-badge text-style-teal mb-2">2</div>
+                <h4 class="font-black text-xs uppercase mb-1">Formation Continue</h4>
+                <p class="text-[11px] text-white/90">Montée en compétences des praticiens.</p>
+              </div>
+
+              <div class="slide-item step-4 capsule-vertical pill-orange p-4 text-white flex flex-col items-center text-center">
+                <div class="circle-badge text-style-orange mb-2">3</div>
+                <h4 class="font-black text-xs uppercase mb-1">Maintenance</h4>
+                <p class="text-[11px] text-white/90">Maintenance préventive, SLA & pièces.</p>
+              </div>
+
+              <div class="slide-item step-5 capsule-vertical pill-green p-4 text-white flex flex-col items-center text-center">
+                <div class="circle-badge text-style-green mb-2">4</div>
+                <h4 class="font-black text-xs uppercase mb-1">Interconnexion</h4>
+                <p class="text-[11px] text-white/90">Raccordement de tous les centres périphériques.</p>
+              </div>
+
+              <div class="slide-item step-6 capsule-vertical pill-dark p-4 text-white flex flex-col items-center text-center">
+                <div class="circle-badge text-style-dark mb-2">5</div>
+                <h4 class="font-black text-xs uppercase mb-1">Sécurité Données</h4>
+                <p class="text-[11px] text-white/90">Conformité PSSI, audits & cyber-résilience.</p>
+              </div>
+            </div>
+          </div>
+        `
+      },
+
+      // SLIDE 13: Connectivité et Interconnexion
+      {
+        id: 13,
+        title: "Connectivité & Interconnexion",
+        steps: 7,
+        render: () => `
+          <div class="w-full space-y-4">
+            <div class="text-center space-y-1">
+              <span class="px-3.5 py-1 rounded-full bg-style-teal/10 text-style-teal text-xs font-bold uppercase tracking-wider">12 | MAILLAGE RÉSEAU</span>
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-style-dark font-display">CONNECTIVITÉ & INTERCONNEXION</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-4xl mx-auto pt-2">
+              <div class="slide-item step-2 capsule-pill pill-red px-5 py-3 flex items-center space-x-3 text-white">
+                <div class="circle-badge text-style-red">1</div>
+                <div>
+                  <h4 class="font-black text-xs uppercase">Fibre Optique</h4>
+                  <p class="text-[11px] text-white/90">Dorsale nationale haut débit pour les CHU & CHR.</p>
+                </div>
+              </div>
+
+              <div class="slide-item step-3 capsule-pill pill-teal px-5 py-3 flex items-center space-x-3 text-white">
+                <div class="circle-badge text-style-teal">2</div>
+                <div>
+                  <h4 class="font-black text-xs uppercase">VSAT Gouvernemental</h4>
+                  <p class="text-[11px] text-white/90">Liaison satellite pour les zones reculées.</p>
+                </div>
+              </div>
+
+              <div class="slide-item step-4 capsule-pill pill-orange px-5 py-3 flex items-center space-x-3 text-white">
+                <div class="circle-badge text-style-orange">3</div>
+                <div>
+                  <h4 class="font-black text-xs uppercase">Internet Haut Débit</h4>
+                  <p class="text-[11px] text-white/90">Bande passante garantie et latence minimale.</p>
+                </div>
+              </div>
+
+              <div class="slide-item step-5 capsule-pill pill-green px-5 py-3 flex items-center space-x-4 text-white">
+                <div class="circle-badge text-style-green">4</div>
+                <div>
+                  <h4 class="font-black text-xs uppercase">Couverture 4G</h4>
+                  <p class="text-[11px] text-white/90">Tablettes terrain et synchronisation mobile.</p>
+                </div>
+              </div>
+
+              <div class="slide-item step-6 capsule-pill pill-dark px-5 py-3 flex items-center space-x-4 text-white">
+                <div class="circle-badge text-style-dark">5</div>
+                <div>
+                  <h4 class="font-black text-xs uppercase">Coût de la Data</h4>
+                  <p class="text-[11px] text-white/90">Optimisation des forfaits et partenariats télécoms.</p>
+                </div>
+              </div>
+
+              <div class="slide-item step-7 capsule-pill pill-red px-5 py-3 flex items-center space-x-4 text-white">
+                <div class="circle-badge text-style-red">6</div>
+                <div>
+                  <h4 class="font-black text-xs uppercase">Énergie & Secours</h4>
+                  <p class="text-[11px] text-white/90">Stabilité électrique et appoint solaire.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+
+      // SLIDE 14: Identité, Adoption et Sécurité
+      {
+        id: 14,
+        title: "Identité, Adoption et Sécurité",
+        steps: 5,
+        render: () => `
+          <div class="w-full space-y-6">
+            <div class="text-center space-y-1">
+              <span class="px-3.5 py-1 rounded-full bg-style-teal/10 text-style-teal text-xs font-bold uppercase tracking-wider">13 | GOUVERNANCE & CONFIANCE</span>
+              <h2 class="text-3xl font-extrabold text-style-dark font-display">IDENTITÉ, ADOPTION ET SÉCURITÉ</h2>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto pt-2">
+              <div class="slide-item step-2 capsule-vertical pill-red p-5 text-white flex flex-col items-center text-center">
+                <div class="circle-badge text-style-red mb-3">1</div>
+                <h4 class="font-black text-sm uppercase mb-1">Identifiant Unique</h4>
+                <p class="text-xs text-white/90">Unicité du patient et suppression des doublons.</p>
+                <div class="text-[10px] font-bold bg-white/20 px-3 py-1 rounded-full mt-4">→ IDENTIFIER</div>
+              </div>
+
+              <div class="slide-item step-3 capsule-vertical pill-teal p-5 text-white flex flex-col items-center text-center">
+                <div class="circle-badge text-style-teal mb-3">2</div>
+                <h4 class="font-black text-sm uppercase mb-1">Appropriation Outils</h4>
+                <p class="text-xs text-white/90">Conduite du changement active des soignants.</p>
+                <div class="text-[10px] font-bold bg-white/20 px-3 py-1 rounded-full mt-4">→ ADOPTER</div>
+              </div>
+
+              <div class="slide-item step-4 capsule-vertical pill-orange p-5 text-white flex flex-col items-center text-center">
+                <div class="circle-badge text-style-orange mb-3">3</div>
+                <h4 class="font-black text-sm uppercase mb-1">Sécurité Données</h4>
+                <p class="text-xs text-white/90">Secret médical, chiffrement & intégrité.</p>
+                <div class="text-[10px] font-bold bg-white/20 px-3 py-1 rounded-full mt-4">→ SÉCURISER</div>
+              </div>
+
+              <div class="slide-item step-5 capsule-vertical pill-green p-5 text-white flex flex-col items-center text-center">
+                <div class="circle-badge text-style-green mb-3">4</div>
+                <h4 class="font-black text-sm uppercase mb-1">Cadre Réglementaire</h4>
+                <p class="text-xs text-white/90">Conformité légale aux lois sur les données.</p>
+                <div class="text-[10px] font-bold bg-white/20 px-3 py-1 rounded-full mt-4">→ ENCADRER</div>
+              </div>
+            </div>
+          </div>
+        `
+      },
+
+      // SLIDE 15: Conclusion
+      {
+        id: 15,
+        title: "Conclusion",
+        steps: 4,
+        render: () => `
+          <div class="w-full space-y-6 text-center max-w-4xl mx-auto">
+            <div class="slide-item step-1 space-y-1">
+              <span class="px-3.5 py-1 rounded-full bg-style-green/10 text-style-green text-xs font-bold uppercase tracking-wider">14 | PERSPECTIVES D'AVENIR</span>
+              <h2 class="text-3xl font-extrabold text-style-dark font-display">CONCLUSION</h2>
+            </div>
+
+            <div class="slide-item step-2 bg-white rounded-3xl p-6 border-2 border-style-teal shadow-md">
+              <h3 class="text-2xl sm:text-3xl font-black text-style-dark font-display leading-snug">
+                « La digitalisation transforme progressivement le <span class="text-style-red">système de santé ivoirien</span>. »
+              </h3>
+            </div>
+
+            <div class="slide-item step-3 grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
+              <div class="capsule-pill pill-red p-3.5 text-white flex items-center space-x-3">
+                <div class="circle-badge text-style-red !w-8 !h-8 !text-xs">1</div>
+                <div>
+                  <h5 class="text-xs font-black uppercase">Information</h5>
+                  <p class="text-[10px] text-white/90">Temps réel</p>
+                </div>
+              </div>
+
+              <div class="capsule-pill pill-teal p-3.5 text-white flex items-center space-x-3">
+                <div class="circle-badge text-style-teal !w-8 !h-8 !text-xs">2</div>
+                <div>
+                  <h5 class="text-xs font-black uppercase">Soins</h5>
+                  <p class="text-[10px] text-white/90">Prise en charge</p>
+                </div>
+              </div>
+
+              <div class="capsule-pill pill-orange p-3.5 text-white flex items-center space-x-3">
+                <div class="circle-badge text-style-orange !w-8 !h-8 !text-xs">3</div>
+                <div>
+                  <h5 class="text-xs font-black uppercase">Gestion</h5>
+                  <p class="text-[10px] text-white/90">Efficience</p>
+                </div>
+              </div>
+
+              <div class="capsule-pill pill-green p-3.5 text-white flex items-center space-x-3">
+                <div class="circle-badge text-style-green !w-8 !h-8 !text-xs">4</div>
+                <div>
+                  <h5 class="text-xs font-black uppercase">Décision</h5>
+                  <p class="text-[10px] text-white/90">Par la donnée</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="slide-item step-4 capsule-pill pill-dark py-3 px-6 text-sm font-bold text-white shadow-md">
+              ✨ La réussite du projet repose sur la contribution et l'engagement de tous les acteurs.
+            </div>
+          </div>
+        `
+      }
+    ];
+
+    let currentSlideIdx = 0;
+    let currentStep = 0;
+    let autoPlayInterval = null;
+    let autoPlaySpeed = 2500;
+
+    function toggleAutoPlay() {
+      const btn = document.getElementById('autoplay-btn');
+      const text = document.getElementById('autoplay-text');
+
+      if (autoPlayInterval) {
+        clearInterval(autoPlayInterval);
+        autoPlayInterval = null;
+        text.innerText = "Lecture Auto";
+        btn.classList.remove('bg-style-green', 'text-white');
+        btn.classList.add('bg-style-green/10', 'text-style-green');
+      } else {
+        autoPlayInterval = setInterval(() => {
+          autoStep();
+        }, autoPlaySpeed);
+        text.innerText = "Pause";
+        btn.classList.remove('bg-style-green/10', 'text-style-green');
+        btn.classList.add('bg-style-green', 'text-white');
+      }
+      lucide.createIcons();
+    }
+
+    function changeSpeed(val) {
+      autoPlaySpeed = parseInt(val);
+      if (autoPlayInterval) {
+        clearInterval(autoPlayInterval);
+        autoPlayInterval = setInterval(() => {
+          autoStep();
+        }, autoPlaySpeed);
+      }
+    }
+
+    function autoStep() {
+      const slide = slides[currentSlideIdx];
+      if (currentStep < slide.steps) {
+        currentStep++;
+        revealSteps(currentStep);
+      } else {
+        if (currentSlideIdx < slides.length - 1) {
+          currentSlideIdx++;
+          currentStep = 1;
+          renderCurrentSlide();
+        } else {
+          clearInterval(autoPlayInterval);
+          autoPlayInterval = null;
+          document.getElementById('autoplay-text').innerText = "Rejouer Auto";
+          document.getElementById('autoplay-btn').classList.remove('bg-style-green', 'text-white');
+          document.getElementById('autoplay-btn').classList.add('bg-style-green/10', 'text-style-green');
+        }
+      }
+    }
+
+    function renderCurrentSlide() {
+      const slide = slides[currentSlideIdx];
+      const container = document.getElementById('slide-container');
+      
+      container.innerHTML = slide.render();
+      lucide.createIcons();
+
+      document.getElementById('slide-indicator').innerText = `${String(slide.id).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')}`;
+      document.getElementById('slide-topic-name').innerText = `${slide.id}. ${slide.title}`;
+      
+      const progressPercent = ((currentSlideIdx + 1) / slides.length) * 100;
+      document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+
+      revealSteps(currentStep);
+    }
+
+    function revealSteps(stepNum) {
+      const items = document.querySelectorAll('.slide-item');
+      items.forEach(item => {
+        let matched = false;
+        for (let i = 1; i <= stepNum; i++) {
+          if (item.classList.contains(`step-${i}`)) {
+            matched = true;
+            break;
+          }
+        }
+        if (matched) {
+          item.classList.add('revealed');
+        } else {
+          item.classList.remove('revealed');
+        }
+      });
+    }
+
+    function nextStep() {
+      const slide = slides[currentSlideIdx];
+      if (currentStep < slide.steps) {
+        currentStep++;
+        revealSteps(currentStep);
+      } else {
+        if (currentSlideIdx < slides.length - 1) {
+          currentSlideIdx++;
+          currentStep = 1;
+          renderCurrentSlide();
+        }
+      }
+    }
+
+    function prevStep() {
+      if (currentStep > 1) {
+        currentStep--;
+        revealSteps(currentStep);
+      } else {
+        if (currentSlideIdx > 0) {
+          currentSlideIdx--;
+          currentStep = slides[currentSlideIdx].steps;
+          renderCurrentSlide();
+        }
+      }
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' || e.code === 'ArrowRight' || e.code === 'PageDown') {
+        e.preventDefault();
+        nextStep();
+      } else if (e.code === 'ArrowLeft' || e.code === 'PageUp' || e.code === 'Backspace') {
+        e.preventDefault();
+        prevStep();
+      } else if (e.key === 'a' || e.key === 'A' || e.key === 'p' || e.key === 'P') {
+        e.preventDefault();
+        toggleAutoPlay();
+      } else if (e.key === 'f' || e.key === 'F') {
+        e.preventDefault();
+        toggleFullscreen();
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        currentSlideIdx = 0;
+        currentStep = 1;
+        renderCurrentSlide();
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        currentSlideIdx = slides.length - 1;
+        currentStep = slides[currentSlideIdx].steps;
+        renderCurrentSlide();
+      }
+    });
+
+    // Background Canvas Particles
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.vx = (Math.random() - 0.5) * 0.4;
+        this.vy = (Math.random() - 0.5) * 0.4;
+        this.radius = Math.random() * 1.8 + 0.8;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = '#007a87';
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < 40; i++) {
+      particles.push(new Particle());
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw();
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 120) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(0, 122, 135, ${0.12 * (1 - dist / 120)})`;
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    currentStep = 1;
+    renderCurrentSlide();
+  </script>
+</body>
+</html>
