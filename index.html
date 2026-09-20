@@ -136,78 +136,104 @@
       pointer-events: none;
       opacity: 0.25;
     }
+    /* Custom Scrollbar for slide container on smaller viewports */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    
+    @media (max-width: 640px) {
+      .capsule-pill {
+        border-radius: 20px;
+      }
+      .circle-badge {
+        width: 34px !important;
+        height: 34px !important;
+        font-size: 0.95rem !important;
+      }
+    }
   </style>
 </head>
-<body class="w-screen h-screen flex flex-col justify-between relative overflow-hidden bg-style-bg">
+<body class="w-full min-h-screen h-screen flex flex-col justify-between relative overflow-hidden bg-style-bg text-[#102a38]">
 
   <!-- Background Particle Network -->
   <canvas id="bg-canvas"></canvas>
 
   <!-- Header Institutionnel -->
-  <header class="relative z-20 w-full px-8 py-3 flex items-center justify-between border-b border-style-border bg-white/90 backdrop-blur-md shadow-sm">
-    <div class="flex items-center space-x-4">
-      <img src="assets/logo_sante.png" alt="Ministère de la Santé" class="h-10 object-contain rounded bg-white shadow-sm p-1 border border-slate-200">
-      <div class="h-6 w-px bg-slate-300"></div>
-      <img src="assets/logo_disd.png" alt="DISD" class="h-10 object-contain bg-white shadow-sm p-1 rounded border border-slate-200">
+  <header class="relative z-20 w-full px-3 sm:px-6 lg:px-8 py-2 sm:py-3 flex items-center justify-between border-b border-style-border bg-white/95 backdrop-blur-md shadow-sm">
+    <div class="flex items-center space-x-2 sm:space-x-4">
+      <img src="assets/logo_sante.png" alt="Ministère de la Santé" class="h-7 sm:h-10 object-contain rounded bg-white shadow-sm p-0.5 sm:p-1 border border-slate-200">
+      <div class="h-5 sm:h-6 w-px bg-slate-300"></div>
+      <img src="assets/logo_disd.png" alt="DISD" class="h-7 sm:h-10 object-contain bg-white shadow-sm p-0.5 sm:p-1 rounded border border-slate-200">
       <div class="hidden md:block">
         <span class="text-xs font-bold uppercase tracking-wider text-style-teal">Ministère de la Santé, de l'Hygiène Publique et de la CMU</span>
-        <span class="text-xs block text-slate-500">Direction de l'Informatique et de la Santé Digitale (DISD)</span>
+        <span class="text-[11px] block text-slate-500 font-medium">Direction de l'Informatique et de la Santé Digitale (DISD)</span>
       </div>
     </div>
 
     <!-- Controls & Auto-play -->
-    <div class="flex items-center space-x-3">
-      <button id="autoplay-btn" onclick="toggleAutoPlay()" class="px-3.5 py-1.5 rounded-full bg-style-green/10 hover:bg-style-green/20 border border-style-green/30 text-style-green transition flex items-center space-x-1.5 text-xs font-bold shadow-sm" title="Activer / Arrêter la lecture automatique (Touche A)">
+    <div class="flex items-center space-x-1.5 sm:space-x-3">
+      <button id="autoplay-btn" onclick="toggleAutoPlay()" class="px-2.5 sm:px-3.5 py-1.5 rounded-full bg-style-green/10 hover:bg-style-green/20 border border-style-green/30 text-style-green transition flex items-center space-x-1 sm:space-x-1.5 text-xs font-bold shadow-sm" title="Activer / Arrêter la lecture automatique (Touche A)">
         <i id="autoplay-icon" data-lucide="play" class="w-3.5 h-3.5 text-style-green"></i>
-        <span id="autoplay-text">Lecture Auto</span>
+        <span id="autoplay-text" class="hidden sm:inline">Lecture Auto</span>
       </button>
 
-      <select id="speed-select" onchange="changeSpeed(this.value)" class="bg-white text-slate-700 border border-slate-300 text-xs rounded-full px-3 py-1.5 outline-none font-semibold cursor-pointer shadow-sm">
-        <option value="1500">1.5s (Très rapide)</option>
-        <option value="2500">2.5s (Rapide)</option>
-        <option value="4000" selected>4.0s (Standard)</option>
-        <option value="6000">6.0s (Modéré)</option>
-        <option value="8000">8.0s (Posé)</option>
-        <option value="10000">10.0s (Détaillé)</option>
+      <select id="speed-select" onchange="changeSpeed(this.value)" class="bg-white text-slate-700 border border-slate-300 text-[11px] sm:text-xs rounded-full px-2 sm:px-3 py-1 sm:py-1.5 outline-none font-semibold cursor-pointer shadow-sm">
+        <option value="1500">1.5s</option>
+        <option value="2500">2.5s</option>
+        <option value="4000" selected>4.0s</option>
+        <option value="6000">6.0s</option>
+        <option value="8000">8.0s</option>
+        <option value="10000">10.0s</option>
       </select>
 
-      <span id="slide-indicator" class="px-3.5 py-1 rounded-full text-xs font-mono font-bold bg-style-teal/10 text-style-teal border border-style-teal/30">
+      <span id="slide-indicator" class="px-2.5 sm:px-3.5 py-1 rounded-full text-[11px] sm:text-xs font-mono font-bold bg-style-teal/10 text-style-teal border border-style-teal/30">
         01 / 15
       </span>
 
-      <button onclick="toggleFullscreen()" class="p-2 rounded-full bg-white hover:bg-slate-100 text-slate-600 transition border border-slate-300 shadow-sm" title="Plein écran (Touche F)">
-        <i data-lucide="maximize" class="w-4 h-4"></i>
+      <button onclick="toggleFullscreen()" class="p-1.5 sm:p-2 rounded-full bg-white hover:bg-slate-100 text-slate-600 transition border border-slate-300 shadow-sm" title="Plein écran (Touche F)">
+        <i data-lucide="maximize" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
       </button>
     </div>
   </header>
 
-  <!-- Slide Viewport -->
-  <main id="slide-container" class="relative z-10 flex-1 w-full max-w-7xl mx-auto px-6 py-4 flex items-center justify-center">
+  <!-- Slide Viewport with Responsive Scrolling & Auto Scaling -->
+  <main id="slide-container" class="relative z-10 flex-1 w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-2 sm:py-4 flex items-center justify-center overflow-y-auto max-h-[calc(100vh-110px)] sm:max-h-[calc(100vh-130px)] custom-scrollbar">
     <!-- Rendered dynamically -->
   </main>
 
   <!-- Footer Navigation -->
-  <footer class="relative z-20 w-full px-8 py-3 flex items-center justify-between border-t border-style-border bg-white/90 backdrop-blur-md shadow-sm">
-    <div class="text-xs font-semibold text-slate-600 flex items-center space-x-2">
-      <span class="inline-block w-2.5 h-2.5 rounded-full bg-style-teal animate-pulse"></span>
-      <span id="slide-topic-name">Processus de Digitalisation</span>
+  <footer class="relative z-20 w-full px-3 sm:px-6 lg:px-8 py-2 sm:py-3 flex items-center justify-between border-t border-style-border bg-white/95 backdrop-blur-md shadow-sm">
+    <div class="text-[11px] sm:text-xs font-semibold text-slate-600 flex items-center space-x-2 truncate max-w-[140px] sm:max-w-xs md:max-w-md">
+      <span class="inline-block w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-style-teal animate-pulse shrink-0"></span>
+      <span id="slide-topic-name" class="truncate">Processus de Digitalisation</span>
     </div>
 
-    <div class="flex items-center space-x-3">
-      <button onclick="prevStep()" class="px-4 py-1.5 rounded-full bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 transition flex items-center space-x-1 text-xs font-semibold shadow-sm">
-        <i data-lucide="chevron-left" class="w-4 h-4"></i>
-        <span>Précédent</span>
+    <div class="flex items-center space-x-2 sm:space-x-3">
+      <button onclick="prevStep()" class="px-3 sm:px-4 py-1.5 rounded-full bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 transition flex items-center space-x-1 text-xs font-semibold shadow-sm">
+        <i data-lucide="chevron-left" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+        <span class="hidden sm:inline">Précédent</span>
       </button>
-      <button onclick="nextStep()" class="px-5 py-1.5 rounded-full bg-style-teal hover:bg-teal-700 text-white font-bold transition flex items-center space-x-1 text-xs shadow-md">
+      <button onclick="nextStep()" class="px-3.5 sm:px-5 py-1.5 rounded-full bg-style-teal hover:bg-teal-700 text-white font-bold transition flex items-center space-x-1 text-xs shadow-md">
         <span>Suivant</span>
-        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        <i data-lucide="chevron-right" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
       </button>
     </div>
 
-    <div class="text-xs text-slate-500 hidden md:flex items-center space-x-3">
-      <span><kbd class="px-2 py-0.5 rounded bg-slate-100 border border-slate-300 text-slate-700 text-[10px] font-mono">A</kbd> : Auto-play</span>
-      <span><kbd class="px-2 py-0.5 rounded bg-slate-100 border border-slate-300 text-slate-700 text-[10px] font-mono">→</kbd> : Suivant</span>
-      <span><kbd class="px-2 py-0.5 rounded bg-slate-100 border border-slate-300 text-slate-700 text-[10px] font-mono">F</kbd> : Plein écran</span>
+    <div class="text-[11px] text-slate-500 hidden lg:flex items-center space-x-3">
+      <span><kbd class="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-300 text-slate-700 text-[10px] font-mono">A</kbd> : Auto</span>
+      <span><kbd class="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-300 text-slate-700 text-[10px] font-mono">→</kbd> : Suivant</span>
+      <span><kbd class="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-300 text-slate-700 text-[10px] font-mono">F</kbd> : Plein écran</span>
     </div>
   </footer>
 
@@ -224,64 +250,64 @@
         title: "Page de Garde",
         steps: 5,
         render: () => `
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center w-full">
-            <div class="lg:col-span-7 space-y-5">
-              <div class="slide-item step-1 inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-style-teal/10 border border-style-teal/30 text-style-teal text-xs font-bold uppercase tracking-wider">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center w-full py-2">
+            <div class="lg:col-span-7 space-y-4 sm:space-y-5">
+              <div class="slide-item step-1 inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-style-teal/10 border border-style-teal/30 text-style-teal text-[11px] sm:text-xs font-bold uppercase tracking-wider">
                 <i data-lucide="activity" class="w-3.5 h-3.5"></i>
                 <span>Transformation Numérique de la Santé</span>
               </div>
               
               <div class="space-y-1">
-                <h1 class="slide-item step-2 text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-style-dark leading-tight font-display">
+                <h1 class="slide-item step-2 text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-style-dark leading-tight font-display">
                   PROCESSUS DE <span class="text-style-red">DIGITALISATION</span>
                 </h1>
-                <p class="slide-item step-2 text-xl sm:text-2xl text-style-teal font-bold">
+                <p class="slide-item step-2 text-lg sm:text-2xl text-style-teal font-bold">
                   du système de santé en Côte d’Ivoire
                 </p>
               </div>
 
-              <div class="slide-item step-3 w-20 h-1.5 bg-style-red rounded-full"></div>
+              <div class="slide-item step-3 w-16 sm:w-20 h-1 sm:h-1.5 bg-style-red rounded-full"></div>
 
-              <div class="slide-item step-4 space-y-2 pt-2">
-                <div class="text-xs font-bold uppercase tracking-widest text-slate-500">Présenté par :</div>
-                <div class="text-lg font-extrabold text-style-dark flex items-center space-x-2">
-                  <span class="w-3 h-3 rounded-full bg-style-red"></span>
+              <div class="slide-item step-4 space-y-1.5 sm:space-y-2 pt-1 sm:pt-2">
+                <div class="text-[11px] sm:text-xs font-bold uppercase tracking-widest text-slate-500">Présenté par :</div>
+                <div class="text-base sm:text-lg font-extrabold text-style-dark flex items-center space-x-2">
+                  <span class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-style-red"></span>
                   <span>M. OUATTARA Yacouba</span>
                 </div>
-                <div class="slide-item step-5 text-sm text-slate-600 flex flex-col space-y-0.5 pl-4 border-l-2 border-style-teal">
+                <div class="slide-item step-5 text-xs sm:text-sm text-slate-600 flex flex-col space-y-0.5 pl-3 sm:pl-4 border-l-2 border-style-teal">
                   <span class="font-bold text-style-teal">Ingénieur Informaticien</span>
                   <span class="text-slate-500 font-medium">Direction de l’Informatique et de la Santé Digitale (DISD)</span>
                 </div>
               </div>
             </div>
 
-            <div class="lg:col-span-5 slide-item step-1 space-y-3">
-              <div class="capsule-pill pill-red px-4 py-3 flex items-center space-x-3 text-white">
+            <div class="lg:col-span-5 slide-item step-1 space-y-2.5 sm:space-y-3">
+              <div class="capsule-pill pill-red px-3.5 sm:px-4 py-2.5 sm:py-3 flex items-center space-x-3 text-white">
                 <div class="circle-badge text-style-red">1</div>
                 <div>
-                  <div class="font-black text-sm uppercase tracking-wider">Datacenter National</div>
-                  <div class="text-xs text-white/90">Haute disponibilité, résilience & sécurité</div>
+                  <div class="font-black text-xs sm:text-sm uppercase tracking-wider">Datacenter National</div>
+                  <div class="text-[11px] sm:text-xs text-white/90">Haute disponibilité, résilience & sécurité</div>
                 </div>
               </div>
-              <div class="capsule-pill pill-teal px-4 py-3 flex items-center space-x-3 text-white">
+              <div class="capsule-pill pill-teal px-3.5 sm:px-4 py-2.5 sm:py-3 flex items-center space-x-3 text-white">
                 <div class="circle-badge text-style-teal">2</div>
                 <div>
-                  <div class="font-black text-sm uppercase tracking-wider">Écosystème SNIS</div>
-                  <div class="text-xs text-white/90">DHIS2, SIGDEP3, OpenELIS connectés</div>
+                  <div class="font-black text-xs sm:text-sm uppercase tracking-wider">Écosystème SNIS</div>
+                  <div class="text-[11px] sm:text-xs text-white/90">DHIS2, SIGDEP3, OpenELIS connectés</div>
                 </div>
               </div>
-              <div class="capsule-pill pill-orange px-4 py-3 flex items-center space-x-3 text-white">
+              <div class="capsule-pill pill-orange px-3.5 sm:px-4 py-2.5 sm:py-3 flex items-center space-x-3 text-white">
                 <div class="circle-badge text-style-orange">3</div>
                 <div>
-                  <div class="font-black text-sm uppercase tracking-wider">Chaîne Médicale & DPI</div>
-                  <div class="text-xs text-white/90">E-SIGL, M-Supply, UPID et dossier patient</div>
+                  <div class="font-black text-xs sm:text-sm uppercase tracking-wider">Chaîne Médicale & DPI</div>
+                  <div class="text-[11px] sm:text-xs text-white/90">E-SIGL, M-Supply, UPID et dossier patient</div>
                 </div>
               </div>
-              <div class="capsule-pill pill-green px-4 py-3 flex items-center space-x-3 text-white">
+              <div class="capsule-pill pill-green px-3.5 sm:px-4 py-2.5 sm:py-3 flex items-center space-x-3 text-white">
                 <div class="circle-badge text-style-green">4</div>
                 <div>
-                  <div class="font-black text-sm uppercase tracking-wider">Gouvernance & Impact</div>
-                  <div class="text-xs text-white/90">Pilotage décisionnel et soins optimisés</div>
+                  <div class="font-black text-xs sm:text-sm uppercase tracking-wider">Gouvernance & Impact</div>
+                  <div class="text-[11px] sm:text-xs text-white/90">Pilotage décisionnel et soins optimisés</div>
                 </div>
               </div>
             </div>
@@ -295,49 +321,49 @@
         title: "Introduction",
         steps: 5,
         render: () => `
-          <div class="w-full space-y-6">
+          <div class="w-full space-y-4 sm:space-y-6 py-2">
             <div class="text-center space-y-1">
-              <span class="px-3.5 py-1 rounded-full bg-style-teal/10 text-style-teal text-xs font-bold uppercase tracking-wider">01 | CONTEXTE STRATÉGIQUE</span>
-              <h2 class="text-3xl font-extrabold text-style-dark font-display">INTRODUCTION</h2>
+              <span class="px-3 sm:px-3.5 py-0.5 sm:py-1 rounded-full bg-style-teal/10 text-style-teal text-[10px] sm:text-xs font-bold uppercase tracking-wider">01 | CONTEXTE STRATÉGIQUE</span>
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-style-dark font-display">INTRODUCTION</h2>
             </div>
 
-            <div class="slide-item step-1 bg-white rounded-2xl p-4 border-2 border-style-teal text-center max-w-3xl mx-auto shadow-md">
-              <p class="text-base sm:text-lg text-style-dark font-medium">
-                <span class="px-2.5 py-0.5 rounded-full bg-style-red text-white font-bold text-xs mr-1">Depuis 2021</span>, 
+            <div class="slide-item step-1 bg-white rounded-2xl p-3 sm:p-4 border-2 border-style-teal text-center max-w-3xl mx-auto shadow-md">
+              <p class="text-sm sm:text-base md:text-lg text-style-dark font-medium leading-relaxed">
+                <span class="px-2 py-0.5 rounded-full bg-style-red text-white font-bold text-[11px] sm:text-xs mr-1">Depuis 2021</span>, 
                 le MSHPCMU accélère l’intégration du numérique dans le <strong class="text-style-teal">Système National d'Information Sanitaire (SNIS)</strong>.
               </p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
-              <div class="slide-item step-2 capsule-pill pill-red p-4 flex items-center space-x-4 text-white">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 max-w-4xl mx-auto">
+              <div class="slide-item step-2 capsule-pill pill-red p-3 sm:p-4 flex items-center space-x-3 sm:space-x-4 text-white">
                 <div class="circle-badge text-style-red">1</div>
                 <div>
-                  <h3 class="font-extrabold text-base uppercase tracking-wider">Qualité des Données</h3>
-                  <p class="text-xs text-white/90">Améliorer l'exhaustivité, la promptitude et la fiabilité des statistiques.</p>
+                  <h3 class="font-extrabold text-sm sm:text-base uppercase tracking-wider">Qualité des Données</h3>
+                  <p class="text-[11px] sm:text-xs text-white/90">Améliorer l'exhaustivité, la promptitude et la fiabilité des statistiques.</p>
                 </div>
               </div>
 
-              <div class="slide-item step-3 capsule-pill pill-teal p-4 flex items-center space-x-4 text-white">
+              <div class="slide-item step-3 capsule-pill pill-teal p-3 sm:p-4 flex items-center space-x-3 sm:space-x-4 text-white">
                 <div class="circle-badge text-style-teal">2</div>
                 <div>
-                  <h3 class="font-extrabold text-base uppercase tracking-wider">Prise de Décision</h3>
-                  <p class="text-xs text-white/90">Faciliter le pilotage basé sur des indicateurs fiables en temps réel.</p>
+                  <h3 class="font-extrabold text-sm sm:text-base uppercase tracking-wider">Prise de Décision</h3>
+                  <p class="text-[11px] sm:text-xs text-white/90">Faciliter le pilotage basé sur des indicateurs fiables en temps réel.</p>
                 </div>
               </div>
 
-              <div class="slide-item step-4 capsule-pill pill-orange p-4 flex items-center space-x-4 text-white">
+              <div class="slide-item step-4 capsule-pill pill-orange p-3 sm:p-4 flex items-center space-x-3 sm:space-x-4 text-white">
                 <div class="circle-badge text-style-orange">3</div>
                 <div>
-                  <h3 class="font-extrabold text-base uppercase tracking-wider">Prise en Charge</h3>
-                  <p class="text-xs text-white/90">Fluidifier le parcours patient et optimiser les soins dans les établissements.</p>
+                  <h3 class="font-extrabold text-sm sm:text-base uppercase tracking-wider">Prise en Charge</h3>
+                  <p class="text-[11px] sm:text-xs text-white/90">Fluidifier le parcours patient et optimiser les soins dans les établissements.</p>
                 </div>
               </div>
 
-              <div class="slide-item step-5 capsule-pill pill-green p-4 flex items-center space-x-4 text-white">
+              <div class="slide-item step-5 capsule-pill pill-green p-3 sm:p-4 flex items-center space-x-3 sm:space-x-4 text-white">
                 <div class="circle-badge text-style-green">4</div>
                 <div>
-                  <h3 class="font-extrabold text-base uppercase tracking-wider">Modernisation</h3>
-                  <p class="text-xs text-white/90">Pérenniser et moderniser durablement le système d'information sanitaire.</p>
+                  <h3 class="font-extrabold text-sm sm:text-base uppercase tracking-wider">Modernisation</h3>
+                  <p class="text-[11px] sm:text-xs text-white/90">Pérenniser et moderniser durablement le système d'information sanitaire.</p>
                 </div>
               </div>
             </div>
@@ -351,51 +377,51 @@
         title: "Le Datacenter",
         steps: 5,
         render: () => `
-          <div class="w-full space-y-4">
+          <div class="w-full space-y-4 py-2">
             <div class="text-center space-y-1">
-              <span class="px-3.5 py-1 rounded-full bg-style-teal/10 text-style-teal text-xs font-bold uppercase tracking-wider">02 | CŒUR TECHNIQUE</span>
+              <span class="px-3 sm:px-3.5 py-0.5 sm:py-1 rounded-full bg-style-teal/10 text-style-teal text-[10px] sm:text-xs font-bold uppercase tracking-wider">02 | CŒUR TECHNIQUE</span>
               <h2 class="text-2xl sm:text-3xl font-extrabold text-style-dark font-display">LE DATACENTER</h2>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center max-w-5xl mx-auto pt-2">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-center max-w-5xl mx-auto pt-1">
               <div class="lg:col-span-4 flex flex-col items-center justify-center slide-item step-1">
-                <div class="central-hub w-48 h-48 flex flex-col items-center justify-center text-center p-4">
-                  <span class="text-2xl mb-1">🖥️</span>
-                  <div class="font-black text-lg uppercase tracking-wider text-style-dark leading-tight">Datacenter</div>
-                  <div class="text-[11px] font-bold text-style-teal mt-0.5">Santé Digitale CI</div>
+                <div class="central-hub w-36 h-36 sm:w-44 sm:h-48 flex flex-col items-center justify-center text-center p-3 sm:p-4">
+                  <span class="text-xl sm:text-2xl mb-1">🖥️</span>
+                  <div class="font-black text-base sm:text-lg uppercase tracking-wider text-style-dark leading-tight">Datacenter</div>
+                  <div class="text-[10px] sm:text-[11px] font-bold text-style-teal mt-0.5">Santé Digitale CI</div>
                 </div>
               </div>
 
-              <div class="lg:col-span-8 space-y-3">
-                <div class="slide-item step-2 capsule-pill pill-red px-5 py-3 flex items-center space-x-4 text-white">
+              <div class="lg:col-span-8 space-y-2.5 sm:space-y-3">
+                <div class="slide-item step-2 capsule-pill pill-red px-4 sm:px-5 py-2.5 sm:py-3 flex items-center space-x-3 sm:space-x-4 text-white">
                   <div class="circle-badge text-style-red">1</div>
                   <div>
-                    <h4 class="font-black text-sm uppercase tracking-wider">Centraliser les Données</h4>
-                    <p class="text-xs text-white/90">Entrepôt unifié mettant fin au cloisonnement des informations de santé.</p>
+                    <h4 class="font-black text-xs sm:text-sm uppercase tracking-wider">Centraliser les Données</h4>
+                    <p class="text-[11px] sm:text-xs text-white/90">Entrepôt unifié mettant fin au cloisonnement des informations de santé.</p>
                   </div>
                 </div>
 
-                <div class="slide-item step-3 capsule-pill pill-teal px-5 py-3 flex items-center space-x-4 text-white">
+                <div class="slide-item step-3 capsule-pill pill-teal px-4 sm:px-5 py-2.5 sm:py-3 flex items-center space-x-3 sm:space-x-4 text-white">
                   <div class="circle-badge text-style-teal">2</div>
                   <div>
-                    <h4 class="font-black text-sm uppercase tracking-wider">Sécuriser les Informations</h4>
-                    <p class="text-xs text-white/90">Confidentialité, chiffrement, haute résilience et conformité SSI.</p>
+                    <h4 class="font-black text-xs sm:text-sm uppercase tracking-wider">Sécuriser les Informations</h4>
+                    <p class="text-[11px] sm:text-xs text-white/90">Confidentialité, chiffrement, haute résilience et conformité SSI.</p>
                   </div>
                 </div>
 
-                <div class="slide-item step-4 capsule-pill pill-orange px-5 py-3 flex items-center space-x-4 text-white">
+                <div class="slide-item step-4 capsule-pill pill-orange px-4 sm:px-5 py-2.5 sm:py-3 flex items-center space-x-3 sm:space-x-4 text-white">
                   <div class="circle-badge text-style-orange">3</div>
                   <div>
-                    <h4 class="font-black text-sm uppercase tracking-wider">Systèmes Intégrés</h4>
-                    <p class="text-xs text-white/90">Interopérabilité fluide entre hôpitaux, cliniques et laboratoires.</p>
+                    <h4 class="font-black text-xs sm:text-sm uppercase tracking-wider">Systèmes Intégrés</h4>
+                    <p class="text-[11px] sm:text-xs text-white/90">Interopérabilité fluide entre hôpitaux, cliniques et laboratoires.</p>
                   </div>
                 </div>
 
-                <div class="slide-item step-5 capsule-pill pill-green px-5 py-3 flex items-center space-x-4 text-white">
+                <div class="slide-item step-5 capsule-pill pill-green px-4 sm:px-5 py-2.5 sm:py-3 flex items-center space-x-3 sm:space-x-4 text-white">
                   <div class="circle-badge text-style-green">4</div>
                   <div>
-                    <h4 class="font-black text-sm uppercase tracking-wider">Moderniser les Outils</h4>
-                    <p class="text-xs text-white/90">Applications web/mobiles performantes au service des praticiens.</p>
+                    <h4 class="font-black text-xs sm:text-sm uppercase tracking-wider">Moderniser les Outils</h4>
+                    <p class="text-[11px] sm:text-xs text-white/90">Applications web/mobiles performantes au service des praticiens.</p>
                   </div>
                 </div>
               </div>
@@ -624,39 +650,39 @@
         title: "Chronologie de mise en œuvre",
         steps: 5,
         render: () => `
-          <div class="w-full space-y-6">
+          <div class="w-full space-y-4 sm:space-y-6 py-2">
             <div class="text-center space-y-1">
-              <span class="px-3.5 py-1 rounded-full bg-style-teal/10 text-style-teal text-xs font-bold uppercase tracking-wider">07 | FEUILLE DE ROUTE (2021 - 2024)</span>
-              <h2 class="text-3xl font-extrabold text-style-dark font-display">CHRONOLOGIE DE MISE EN ŒUVRE</h2>
+              <span class="px-3 sm:px-3.5 py-0.5 sm:py-1 rounded-full bg-style-teal/10 text-style-teal text-[10px] sm:text-xs font-bold uppercase tracking-wider">07 | FEUILLE DE ROUTE (2021 - 2024)</span>
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-style-dark font-display">CHRONOLOGIE DE MISE EN ŒUVRE</h2>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
-              <div class="slide-item step-1 capsule-vertical pill-red p-5 text-white flex flex-col items-center text-center">
-                <div class="circle-badge text-style-red mb-3">1</div>
-                <h4 class="font-black text-base uppercase mb-1">2021 — Cadrage</h4>
-                <p class="text-xs text-white/90">Signature des contrats et passation des marchés.</p>
-                <div class="text-[10px] uppercase font-bold bg-white/20 px-3 py-1 rounded-full mt-4">Phase : Préparation</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 max-w-6xl mx-auto">
+              <div class="slide-item step-1 capsule-vertical pill-red p-4 sm:p-5 text-white flex flex-col items-center text-center">
+                <div class="circle-badge text-style-red mb-2 sm:mb-3">1</div>
+                <h4 class="font-black text-sm sm:text-base uppercase mb-1">2021 — Cadrage</h4>
+                <p class="text-[11px] sm:text-xs text-white/90">Signature des contrats et passation des marchés.</p>
+                <div class="text-[9px] sm:text-[10px] uppercase font-bold bg-white/20 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full mt-3 sm:mt-4">Phase : Préparation</div>
               </div>
 
-              <div class="slide-item step-2 capsule-vertical pill-teal p-5 text-white flex flex-col items-center text-center">
-                <div class="circle-badge text-style-teal mb-3">2</div>
-                <h4 class="font-black text-base uppercase mb-1">2022 — Travaux</h4>
-                <p class="text-xs text-white/90">Génie civil, énergie, climatisation & baies IT.</p>
-                <div class="text-[10px] uppercase font-bold bg-white/20 px-3 py-1 rounded-full mt-4">Phase : Réalisation</div>
+              <div class="slide-item step-2 capsule-vertical pill-teal p-4 sm:p-5 text-white flex flex-col items-center text-center">
+                <div class="circle-badge text-style-teal mb-2 sm:mb-3">2</div>
+                <h4 class="font-black text-sm sm:text-base uppercase mb-1">2022 — Travaux</h4>
+                <p class="text-[11px] sm:text-xs text-white/90">Génie civil, énergie, climatisation & baies IT.</p>
+                <div class="text-[9px] sm:text-[10px] uppercase font-bold bg-white/20 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full mt-3 sm:mt-4">Phase : Réalisation</div>
               </div>
 
-              <div class="slide-item step-3 capsule-vertical pill-orange p-5 text-white flex flex-col items-center text-center">
-                <div class="circle-badge text-style-orange mb-3">3</div>
-                <h4 class="font-black text-base uppercase mb-1">2023 — Recette</h4>
-                <p class="text-xs text-white/90">Recette d'usine, tests de charge & validation.</p>
-                <div class="text-[10px] uppercase font-bold bg-white/20 px-3 py-1 rounded-full mt-4">Phase : Validation</div>
+              <div class="slide-item step-3 capsule-vertical pill-orange p-4 sm:p-5 text-white flex flex-col items-center text-center">
+                <div class="circle-badge text-style-orange mb-2 sm:mb-3">3</div>
+                <h4 class="font-black text-sm sm:text-base uppercase mb-1">2023 — Recette</h4>
+                <p class="text-[11px] sm:text-xs text-white/90">Recette d'usine, tests de charge & validation.</p>
+                <div class="text-[9px] sm:text-[10px] uppercase font-bold bg-white/20 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full mt-3 sm:mt-4">Phase : Validation</div>
               </div>
 
-              <div class="slide-item step-4 capsule-vertical pill-green p-5 text-white flex flex-col items-center text-center">
-                <div class="circle-badge text-style-green mb-3">4</div>
-                <h4 class="font-black text-base uppercase mb-1">2024 — Service</h4>
-                <p class="text-xs text-white/90">Réception provisoire et exploitation active.</p>
-                <div class="text-[10px] uppercase font-bold bg-white/20 px-3 py-1 rounded-full mt-4">Phase : Exploitation</div>
+              <div class="slide-item step-4 capsule-vertical pill-green p-4 sm:p-5 text-white flex flex-col items-center text-center">
+                <div class="circle-badge text-style-green mb-2 sm:mb-3">4</div>
+                <h4 class="font-black text-sm sm:text-base uppercase mb-1">2024 — Service</h4>
+                <p class="text-[11px] sm:text-xs text-white/90">Réception provisoire et exploitation active.</p>
+                <div class="text-[9px] sm:text-[10px] uppercase font-bold bg-white/20 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full mt-3 sm:mt-4">Phase : Exploitation</div>
               </div>
             </div>
           </div>
@@ -669,21 +695,21 @@
         title: "Le Datacenter en Images",
         steps: 4,
         render: () => `
-          <div class="w-full space-y-5">
+          <div class="w-full space-y-4 sm:space-y-5 py-2">
             <div class="text-center space-y-1">
-              <span class="px-3.5 py-1 rounded-full bg-style-teal/10 text-style-teal text-xs font-bold uppercase tracking-wider">08 | VISITE VIRTUELLE DU SITE</span>
-              <h2 class="text-3xl font-extrabold text-style-dark font-display">LE DATACENTER EN IMAGES</h2>
+              <span class="px-3 sm:px-3.5 py-0.5 sm:py-1 rounded-full bg-style-teal/10 text-style-teal text-[10px] sm:text-xs font-bold uppercase tracking-wider">08 | VISITE VIRTUELLE DU SITE</span>
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-style-dark font-display">LE DATACENTER EN IMAGES</h2>
             </div>
 
             <!-- 3 Real Photo Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5 max-w-6xl mx-auto">
               <!-- Photo 1: datacenter1.png -->
               <div class="slide-item step-1 photo-card flex flex-col justify-between">
-                <div class="h-52 w-full overflow-hidden bg-slate-100 relative group">
+                <div class="h-44 sm:h-48 md:h-52 w-full overflow-hidden bg-slate-100 relative group">
                   <img src="assets/datacenter1.png" alt="Salle Serveurs Datacenter" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                 </div>
-                <div class="p-3">
-                  <div class="capsule-pill pill-red px-3.5 py-2 flex items-center space-x-3 text-white">
+                <div class="p-2.5 sm:p-3">
+                  <div class="capsule-pill pill-red px-3 sm:px-3.5 py-2 flex items-center space-x-2.5 sm:space-x-3 text-white">
                     <div class="circle-badge text-style-red !w-7 !h-7 !text-xs">1</div>
                     <div>
                       <div class="font-black text-xs uppercase">Salle Serveurs & Baies IT</div>
@@ -695,11 +721,11 @@
 
               <!-- Photo 2: datacenter4.png -->
               <div class="slide-item step-2 photo-card flex flex-col justify-between">
-                <div class="h-52 w-full overflow-hidden bg-slate-100 relative group">
+                <div class="h-44 sm:h-48 md:h-52 w-full overflow-hidden bg-slate-100 relative group">
                   <img src="assets/datacenter4.png" alt="Énergie et Groupes Electrogènes" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                 </div>
-                <div class="p-3">
-                  <div class="capsule-pill pill-teal px-3.5 py-2 flex items-center space-x-3 text-white">
+                <div class="p-2.5 sm:p-3">
+                  <div class="capsule-pill pill-teal px-3.5 py-2 flex items-center space-x-2.5 sm:space-x-3 text-white">
                     <div class="circle-badge text-style-teal !w-7 !h-7 !text-xs">2</div>
                     <div>
                       <div class="font-black text-xs uppercase">Énergie & Groupes Kohler</div>
@@ -710,12 +736,12 @@
               </div>
 
               <!-- Photo 3: datacenter2.png -->
-              <div class="slide-item step-3 photo-card flex flex-col justify-between">
-                <div class="h-52 w-full overflow-hidden bg-slate-100 relative group">
+              <div class="slide-item step-3 photo-card flex flex-col justify-between sm:col-span-2 md:col-span-1">
+                <div class="h-44 sm:h-48 md:h-52 w-full overflow-hidden bg-slate-100 relative group">
                   <img src="assets/datacenter2.png" alt="Supervision et Monitoring" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                 </div>
-                <div class="p-3">
-                  <div class="capsule-pill pill-green px-3.5 py-2 flex items-center space-x-3 text-white">
+                <div class="p-2.5 sm:p-3">
+                  <div class="capsule-pill pill-green px-3.5 py-2 flex items-center space-x-2.5 sm:space-x-3 text-white">
                     <div class="circle-badge text-style-green !w-7 !h-7 !text-xs">3</div>
                     <div>
                       <div class="font-black text-xs uppercase">Supervision & Monitoring</div>
@@ -726,7 +752,7 @@
               </div>
             </div>
 
-            <div class="slide-item step-4 text-center max-w-2xl mx-auto bg-white rounded-full py-2 px-5 border border-style-border text-xs text-slate-700 font-semibold shadow-sm">
+            <div class="slide-item step-4 text-center max-w-2xl mx-auto bg-white rounded-full py-2 px-4 sm:px-5 border border-style-border text-[11px] sm:text-xs text-slate-700 font-semibold shadow-sm">
               💡 Une infrastructure au cœur de la centralisation et de la sécurisation des données de santé.
             </div>
           </div>
@@ -739,20 +765,20 @@
         title: "Infrastructure technique",
         steps: 4,
         render: () => `
-          <div class="w-full space-y-5">
+          <div class="w-full space-y-4 sm:space-y-5 py-2">
             <div class="text-center space-y-1">
-              <span class="px-3.5 py-1 rounded-full bg-style-teal/10 text-style-teal text-xs font-bold uppercase tracking-wider">09 | ÉQUIPEMENTS TECHNIQUES DE POINTE</span>
-              <h2 class="text-3xl font-extrabold text-style-dark font-display">INFRASTRUCTURE TECHNIQUE DU DATACENTER</h2>
+              <span class="px-3 sm:px-3.5 py-0.5 sm:py-1 rounded-full bg-style-teal/10 text-style-teal text-[10px] sm:text-xs font-bold uppercase tracking-wider">09 | ÉQUIPEMENTS TECHNIQUES DE POINTE</span>
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-style-dark font-display">INFRASTRUCTURE TECHNIQUE DU DATACENTER</h2>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5 max-w-6xl mx-auto">
               <!-- Equipment 1: datacenter1.png -->
               <div class="slide-item step-1 photo-card flex flex-col justify-between">
-                <div class="h-48 w-full overflow-hidden bg-slate-100 relative group">
+                <div class="h-40 sm:h-48 w-full overflow-hidden bg-slate-100 relative group">
                   <img src="assets/datacenter1.png" alt="Baies IT & Confinement" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                 </div>
-                <div class="p-3">
-                  <div class="capsule-pill pill-red px-3.5 py-2 flex items-center space-x-3 text-white">
+                <div class="p-2.5 sm:p-3">
+                  <div class="capsule-pill pill-red px-3 sm:px-3.5 py-2 flex items-center space-x-2.5 sm:space-x-3 text-white">
                     <div class="circle-badge text-style-red !w-7 !h-7 !text-xs">1</div>
                     <div>
                       <div class="font-black text-xs uppercase">Puissance de Calcul & Baies</div>
@@ -764,11 +790,11 @@
 
               <!-- Equipment 2: datacenter3.png -->
               <div class="slide-item step-2 photo-card flex flex-col justify-between">
-                <div class="h-48 w-full overflow-hidden bg-slate-100 relative group">
+                <div class="h-40 sm:h-48 w-full overflow-hidden bg-slate-100 relative group">
                   <img src="assets/datacenter3.png" alt="Aéroréfrigérants externes" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                 </div>
-                <div class="p-3">
-                  <div class="capsule-pill pill-teal px-3.5 py-2 flex items-center space-x-3 text-white">
+                <div class="p-2.5 sm:p-3">
+                  <div class="capsule-pill pill-teal px-3 sm:px-3.5 py-2 flex items-center space-x-2.5 sm:space-x-3 text-white">
                     <div class="circle-badge text-style-teal !w-7 !h-7 !text-xs">2</div>
                     <div>
                       <div class="font-black text-xs uppercase">Climatisation Externe</div>
@@ -779,12 +805,12 @@
               </div>
 
               <!-- Equipment 3: datacenter4.png -->
-              <div class="slide-item step-3 photo-card flex flex-col justify-between">
-                <div class="h-48 w-full overflow-hidden bg-slate-100 relative group">
+              <div class="slide-item step-3 photo-card flex flex-col justify-between sm:col-span-2 md:col-span-1">
+                <div class="h-40 sm:h-48 w-full overflow-hidden bg-slate-100 relative group">
                   <img src="assets/datacenter4.png" alt="Groupes électrogènes secours" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                 </div>
-                <div class="p-3">
-                  <div class="capsule-pill pill-green px-3.5 py-2 flex items-center space-x-3 text-white">
+                <div class="p-2.5 sm:p-3">
+                  <div class="capsule-pill pill-green px-3 sm:px-3.5 py-2 flex items-center space-x-2.5 sm:space-x-3 text-white">
                     <div class="circle-badge text-style-green !w-7 !h-7 !text-xs">3</div>
                     <div>
                       <div class="font-black text-xs uppercase">Continuité Électrique</div>
@@ -795,7 +821,7 @@
               </div>
             </div>
 
-            <div class="slide-item step-4 text-center max-w-3xl mx-auto bg-white rounded-full py-2.5 px-6 border border-style-border text-xs text-slate-700 font-semibold shadow-sm">
+            <div class="slide-item step-4 text-center max-w-3xl mx-auto bg-white rounded-full py-2 sm:py-2.5 px-4 sm:px-6 border border-style-border text-[11px] sm:text-xs text-slate-700 font-semibold shadow-sm">
               « Des équipements conçus pour assurer la disponibilité, la sécurité et la performance des systèmes numériques de santé. »
             </div>
           </div>
@@ -808,11 +834,11 @@
         title: "Au service de la santé digitale",
         steps: 4,
         render: () => `
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center w-full max-w-6xl mx-auto">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center w-full max-w-6xl mx-auto py-2">
             <!-- Left Large Real Photo Card -->
             <div class="lg:col-span-5 slide-item step-1">
-              <div class="photo-card p-3 space-y-3">
-                <div class="h-72 w-full rounded-2xl overflow-hidden bg-slate-100 relative">
+              <div class="photo-card p-2.5 sm:p-3 space-y-2 sm:space-y-3">
+                <div class="h-48 sm:h-64 lg:h-72 w-full rounded-2xl overflow-hidden bg-slate-100 relative">
                   <img src="assets/datacenter_slide_11_image_3.png" alt="Salle Serveurs & Sécurité Datacenter" class="w-full h-full object-cover">
                 </div>
                 <div class="text-center px-2 py-1">
@@ -822,33 +848,33 @@
               </div>
             </div>
 
-            <div class="lg:col-span-7 space-y-3">
+            <div class="lg:col-span-7 space-y-2.5 sm:space-y-3">
               <div class="slide-item step-2 space-y-1">
-                <span class="px-3.5 py-1 rounded-full bg-style-teal/10 text-style-teal text-xs font-bold uppercase tracking-wider">10 | VALEUR AJOUTÉE</span>
-                <h2 class="text-2xl font-extrabold text-style-dark font-display">AU SERVICE DE LA SANTÉ DIGITALE</h2>
+                <span class="px-3 sm:px-3.5 py-0.5 sm:py-1 rounded-full bg-style-teal/10 text-style-teal text-[10px] sm:text-xs font-bold uppercase tracking-wider">10 | VALEUR AJOUTÉE</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-style-dark font-display">AU SERVICE DE LA SANTÉ DIGITALE</h2>
               </div>
 
-              <div class="slide-item step-3 capsule-pill pill-red px-5 py-3.5 flex items-center space-x-4 text-white">
+              <div class="slide-item step-3 capsule-pill pill-red px-4 sm:px-5 py-2.5 sm:py-3.5 flex items-center space-x-3 sm:space-x-4 text-white">
                 <div class="circle-badge text-style-red">1</div>
                 <div>
-                  <h4 class="font-black text-sm uppercase">Centralisation</h4>
-                  <p class="text-xs text-white/90">Unification des bases de données sanitaires nationales.</p>
+                  <h4 class="font-black text-xs sm:text-sm uppercase">Centralisation</h4>
+                  <p class="text-[11px] sm:text-xs text-white/90">Unification des bases de données sanitaires nationales.</p>
                 </div>
               </div>
 
-              <div class="slide-item step-4 capsule-pill pill-teal px-5 py-3.5 flex items-center space-x-4 text-white">
+              <div class="slide-item step-4 capsule-pill pill-teal px-4 sm:px-5 py-2.5 sm:py-3.5 flex items-center space-x-3 sm:space-x-4 text-white">
                 <div class="circle-badge text-style-teal">2</div>
                 <div>
-                  <h4 class="font-black text-sm uppercase">Sécurisation</h4>
-                  <p class="text-xs text-white/90">Chiffrement et conformité stricte aux règles de cybersécurité.</p>
+                  <h4 class="font-black text-xs sm:text-sm uppercase">Sécurisation</h4>
+                  <p class="text-[11px] sm:text-xs text-white/90">Chiffrement et conformité stricte aux règles de cybersécurité.</p>
                 </div>
               </div>
 
-              <div class="slide-item step-4 capsule-pill pill-green px-5 py-3.5 flex items-center space-x-4 text-white">
+              <div class="slide-item step-4 capsule-pill pill-green px-4 sm:px-5 py-2.5 sm:py-3.5 flex items-center space-x-3 sm:space-x-4 text-white">
                 <div class="circle-badge text-style-green">3</div>
                 <div>
-                  <h4 class="font-black text-sm uppercase">Performance</h4>
-                  <p class="text-xs text-white/90">Temps d'accès instantanés pour les professionnels de santé.</p>
+                  <h4 class="font-black text-xs sm:text-sm uppercase">Performance</h4>
+                  <p class="text-[11px] sm:text-xs text-white/90">Temps d'accès instantanés pour les professionnels de santé.</p>
                 </div>
               </div>
             </div>
@@ -862,41 +888,41 @@
         title: "Défis et perspectives",
         steps: 6,
         render: () => `
-          <div class="w-full space-y-5">
+          <div class="w-full space-y-4 sm:space-y-5 py-2">
             <div class="text-center space-y-1">
-              <span class="px-3.5 py-1 rounded-full bg-style-teal/10 text-style-teal text-xs font-bold uppercase tracking-wider">11 | ENJEUX STRATÉGIQUES</span>
-              <h2 class="text-3xl font-extrabold text-style-dark font-display">DÉFIS ET PERSPECTIVES</h2>
+              <span class="px-3 sm:px-3.5 py-0.5 sm:py-1 rounded-full bg-style-teal/10 text-style-teal text-[10px] sm:text-xs font-bold uppercase tracking-wider">11 | ENJEUX STRATÉGIQUES</span>
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-style-dark font-display">DÉFIS ET PERSPECTIVES</h2>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 max-w-6xl mx-auto pt-2">
-              <div class="slide-item step-2 capsule-vertical pill-red p-4 text-white flex flex-col items-center text-center">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 max-w-6xl mx-auto pt-1 sm:pt-2">
+              <div class="slide-item step-2 capsule-vertical pill-red p-3.5 sm:p-4 text-white flex flex-col items-center text-center">
                 <div class="circle-badge text-style-red mb-2">1</div>
                 <h4 class="font-black text-xs uppercase mb-1">Ressources Humaines</h4>
-                <p class="text-[11px] text-white/90">Recrutement et fidélisation d'experts IT.</p>
+                <p class="text-[10px] sm:text-[11px] text-white/90">Recrutement et fidélisation d'experts IT.</p>
               </div>
 
-              <div class="slide-item step-3 capsule-vertical pill-teal p-4 text-white flex flex-col items-center text-center">
+              <div class="slide-item step-3 capsule-vertical pill-teal p-3.5 sm:p-4 text-white flex flex-col items-center text-center">
                 <div class="circle-badge text-style-teal mb-2">2</div>
                 <h4 class="font-black text-xs uppercase mb-1">Formation Continue</h4>
-                <p class="text-[11px] text-white/90">Montée en compétences des praticiens.</p>
+                <p class="text-[10px] sm:text-[11px] text-white/90">Montée en compétences des praticiens.</p>
               </div>
 
-              <div class="slide-item step-4 capsule-vertical pill-orange p-4 text-white flex flex-col items-center text-center">
+              <div class="slide-item step-4 capsule-vertical pill-orange p-3.5 sm:p-4 text-white flex flex-col items-center text-center">
                 <div class="circle-badge text-style-orange mb-2">3</div>
                 <h4 class="font-black text-xs uppercase mb-1">Maintenance</h4>
-                <p class="text-[11px] text-white/90">Maintenance préventive, SLA & pièces.</p>
+                <p class="text-[10px] sm:text-[11px] text-white/90">Maintenance préventive, SLA & pièces.</p>
               </div>
 
-              <div class="slide-item step-5 capsule-vertical pill-green p-4 text-white flex flex-col items-center text-center">
+              <div class="slide-item step-5 capsule-vertical pill-green p-3.5 sm:p-4 text-white flex flex-col items-center text-center">
                 <div class="circle-badge text-style-green mb-2">4</div>
                 <h4 class="font-black text-xs uppercase mb-1">Interconnexion</h4>
-                <p class="text-[11px] text-white/90">Raccordement de tous les centres périphériques.</p>
+                <p class="text-[10px] sm:text-[11px] text-white/90">Raccordement de tous les centres périphériques.</p>
               </div>
 
-              <div class="slide-item step-6 capsule-vertical pill-dark p-4 text-white flex flex-col items-center text-center">
+              <div class="slide-item step-6 capsule-vertical pill-dark p-3.5 sm:p-4 text-white flex flex-col items-center text-center sm:col-span-2 md:col-span-1">
                 <div class="circle-badge text-style-dark mb-2">5</div>
                 <h4 class="font-black text-xs uppercase mb-1">Sécurité Données</h4>
-                <p class="text-[11px] text-white/90">Conformité PSSI, audits & cyber-résilience.</p>
+                <p class="text-[10px] sm:text-[11px] text-white/90">Conformité PSSI, audits & cyber-résilience.</p>
               </div>
             </div>
           </div>
@@ -909,58 +935,58 @@
         title: "Connectivité & Interconnexion",
         steps: 7,
         render: () => `
-          <div class="w-full space-y-4">
+          <div class="w-full space-y-4 py-2">
             <div class="text-center space-y-1">
-              <span class="px-3.5 py-1 rounded-full bg-style-teal/10 text-style-teal text-xs font-bold uppercase tracking-wider">12 | MAILLAGE RÉSEAU</span>
+              <span class="px-3 sm:px-3.5 py-0.5 sm:py-1 rounded-full bg-style-teal/10 text-style-teal text-[10px] sm:text-xs font-bold uppercase tracking-wider">12 | MAILLAGE RÉSEAU</span>
               <h2 class="text-2xl sm:text-3xl font-extrabold text-style-dark font-display">CONNECTIVITÉ & INTERCONNEXION</h2>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-4xl mx-auto pt-2">
-              <div class="slide-item step-2 capsule-pill pill-red px-5 py-3 flex items-center space-x-3 text-white">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-4xl mx-auto pt-1 sm:pt-2">
+              <div class="slide-item step-2 capsule-pill pill-red px-4 sm:px-5 py-2.5 sm:py-3 flex items-center space-x-3 text-white">
                 <div class="circle-badge text-style-red">1</div>
                 <div>
                   <h4 class="font-black text-xs uppercase">Fibre Optique</h4>
-                  <p class="text-[11px] text-white/90">Dorsale nationale haut débit pour les CHU & CHR.</p>
+                  <p class="text-[10px] sm:text-[11px] text-white/90">Dorsale nationale haut débit pour les CHU & CHR.</p>
                 </div>
               </div>
 
-              <div class="slide-item step-3 capsule-pill pill-teal px-5 py-3 flex items-center space-x-3 text-white">
+              <div class="slide-item step-3 capsule-pill pill-teal px-4 sm:px-5 py-2.5 sm:py-3 flex items-center space-x-3 text-white">
                 <div class="circle-badge text-style-teal">2</div>
                 <div>
                   <h4 class="font-black text-xs uppercase">VSAT Gouvernemental</h4>
-                  <p class="text-[11px] text-white/90">Liaison satellite pour les zones reculées.</p>
+                  <p class="text-[10px] sm:text-[11px] text-white/90">Liaison satellite pour les zones reculées.</p>
                 </div>
               </div>
 
-              <div class="slide-item step-4 capsule-pill pill-orange px-5 py-3 flex items-center space-x-3 text-white">
+              <div class="slide-item step-4 capsule-pill pill-orange px-4 sm:px-5 py-2.5 sm:py-3 flex items-center space-x-3 text-white">
                 <div class="circle-badge text-style-orange">3</div>
                 <div>
                   <h4 class="font-black text-xs uppercase">Internet Haut Débit</h4>
-                  <p class="text-[11px] text-white/90">Bande passante garantie et latence minimale.</p>
+                  <p class="text-[10px] sm:text-[11px] text-white/90">Bande passante garantie et latence minimale.</p>
                 </div>
               </div>
 
-              <div class="slide-item step-5 capsule-pill pill-green px-5 py-3 flex items-center space-x-4 text-white">
+              <div class="slide-item step-5 capsule-pill pill-green px-4 sm:px-5 py-2.5 sm:py-3 flex items-center space-x-3 sm:space-x-4 text-white">
                 <div class="circle-badge text-style-green">4</div>
                 <div>
                   <h4 class="font-black text-xs uppercase">Couverture 4G</h4>
-                  <p class="text-[11px] text-white/90">Tablettes terrain et synchronisation mobile.</p>
+                  <p class="text-[10px] sm:text-[11px] text-white/90">Tablettes terrain et synchronisation mobile.</p>
                 </div>
               </div>
 
-              <div class="slide-item step-6 capsule-pill pill-dark px-5 py-3 flex items-center space-x-4 text-white">
+              <div class="slide-item step-6 capsule-pill pill-dark px-4 sm:px-5 py-2.5 sm:py-3 flex items-center space-x-3 sm:space-x-4 text-white">
                 <div class="circle-badge text-style-dark">5</div>
                 <div>
                   <h4 class="font-black text-xs uppercase">Coût de la Data</h4>
-                  <p class="text-[11px] text-white/90">Optimisation des forfaits et partenariats télécoms.</p>
+                  <p class="text-[10px] sm:text-[11px] text-white/90">Optimisation des forfaits et partenariats télécoms.</p>
                 </div>
               </div>
 
-              <div class="slide-item step-7 capsule-pill pill-red px-5 py-3 flex items-center space-x-4 text-white">
+              <div class="slide-item step-7 capsule-pill pill-red px-4 sm:px-5 py-2.5 sm:py-3 flex items-center space-x-3 sm:space-x-4 text-white">
                 <div class="circle-badge text-style-red">6</div>
                 <div>
                   <h4 class="font-black text-xs uppercase">Énergie & Secours</h4>
-                  <p class="text-[11px] text-white/90">Stabilité électrique et appoint solaire.</p>
+                  <p class="text-[10px] sm:text-[11px] text-white/90">Stabilité électrique et appoint solaire.</p>
                 </div>
               </div>
             </div>
@@ -974,39 +1000,39 @@
         title: "Identité, Adoption et Sécurité",
         steps: 5,
         render: () => `
-          <div class="w-full space-y-6">
+          <div class="w-full space-y-4 sm:space-y-6 py-2">
             <div class="text-center space-y-1">
-              <span class="px-3.5 py-1 rounded-full bg-style-teal/10 text-style-teal text-xs font-bold uppercase tracking-wider">13 | GOUVERNANCE & CONFIANCE</span>
-              <h2 class="text-3xl font-extrabold text-style-dark font-display">IDENTITÉ, ADOPTION ET SÉCURITÉ</h2>
+              <span class="px-3 sm:px-3.5 py-0.5 sm:py-1 rounded-full bg-style-teal/10 text-style-teal text-[10px] sm:text-xs font-bold uppercase tracking-wider">13 | GOUVERNANCE & CONFIANCE</span>
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-style-dark font-display">IDENTITÉ, ADOPTION ET SÉCURITÉ</h2>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto pt-2">
-              <div class="slide-item step-2 capsule-vertical pill-red p-5 text-white flex flex-col items-center text-center">
-                <div class="circle-badge text-style-red mb-3">1</div>
-                <h4 class="font-black text-sm uppercase mb-1">Identifiant Unique</h4>
-                <p class="text-xs text-white/90">Unicité du patient et suppression des doublons.</p>
-                <div class="text-[10px] font-bold bg-white/20 px-3 py-1 rounded-full mt-4">→ IDENTIFIER</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 max-w-6xl mx-auto pt-1 sm:pt-2">
+              <div class="slide-item step-2 capsule-vertical pill-red p-4 sm:p-5 text-white flex flex-col items-center text-center">
+                <div class="circle-badge text-style-red mb-2 sm:mb-3">1</div>
+                <h4 class="font-black text-xs sm:text-sm uppercase mb-1">Identifiant Unique</h4>
+                <p class="text-[11px] sm:text-xs text-white/90">Unicité du patient et suppression des doublons.</p>
+                <div class="text-[9px] sm:text-[10px] font-bold bg-white/20 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full mt-3 sm:mt-4">→ IDENTIFIER</div>
               </div>
 
-              <div class="slide-item step-3 capsule-vertical pill-teal p-5 text-white flex flex-col items-center text-center">
-                <div class="circle-badge text-style-teal mb-3">2</div>
-                <h4 class="font-black text-sm uppercase mb-1">Appropriation Outils</h4>
-                <p class="text-xs text-white/90">Conduite du changement active des soignants.</p>
-                <div class="text-[10px] font-bold bg-white/20 px-3 py-1 rounded-full mt-4">→ ADOPTER</div>
+              <div class="slide-item step-3 capsule-vertical pill-teal p-4 sm:p-5 text-white flex flex-col items-center text-center">
+                <div class="circle-badge text-style-teal mb-2 sm:mb-3">2</div>
+                <h4 class="font-black text-xs sm:text-sm uppercase mb-1">Appropriation Outils</h4>
+                <p class="text-[11px] sm:text-xs text-white/90">Conduite du changement active des soignants.</p>
+                <div class="text-[9px] sm:text-[10px] font-bold bg-white/20 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full mt-3 sm:mt-4">→ ADOPTER</div>
               </div>
 
-              <div class="slide-item step-4 capsule-vertical pill-orange p-5 text-white flex flex-col items-center text-center">
-                <div class="circle-badge text-style-orange mb-3">3</div>
-                <h4 class="font-black text-sm uppercase mb-1">Sécurité Données</h4>
-                <p class="text-xs text-white/90">Secret médical, chiffrement & intégrité.</p>
-                <div class="text-[10px] font-bold bg-white/20 px-3 py-1 rounded-full mt-4">→ SÉCURISER</div>
+              <div class="slide-item step-4 capsule-vertical pill-orange p-4 sm:p-5 text-white flex flex-col items-center text-center">
+                <div class="circle-badge text-style-orange mb-2 sm:mb-3">3</div>
+                <h4 class="font-black text-xs sm:text-sm uppercase mb-1">Sécurité Données</h4>
+                <p class="text-[11px] sm:text-xs text-white/90">Secret médical, chiffrement & intégrité.</p>
+                <div class="text-[9px] sm:text-[10px] font-bold bg-white/20 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full mt-3 sm:mt-4">→ SÉCURISER</div>
               </div>
 
-              <div class="slide-item step-5 capsule-vertical pill-green p-5 text-white flex flex-col items-center text-center">
-                <div class="circle-badge text-style-green mb-3">4</div>
-                <h4 class="font-black text-sm uppercase mb-1">Cadre Réglementaire</h4>
-                <p class="text-xs text-white/90">Conformité légale aux lois sur les données.</p>
-                <div class="text-[10px] font-bold bg-white/20 px-3 py-1 rounded-full mt-4">→ ENCADRER</div>
+              <div class="slide-item step-5 capsule-vertical pill-green p-4 sm:p-5 text-white flex flex-col items-center text-center">
+                <div class="circle-badge text-style-green mb-2 sm:mb-3">4</div>
+                <h4 class="font-black text-xs sm:text-sm uppercase mb-1">Cadre Réglementaire</h4>
+                <p class="text-[11px] sm:text-xs text-white/90">Conformité légale aux lois sur les données.</p>
+                <div class="text-[9px] sm:text-[10px] font-bold bg-white/20 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full mt-3 sm:mt-4">→ ENCADRER</div>
               </div>
             </div>
           </div>
@@ -1019,45 +1045,45 @@
         title: "Conclusion",
         steps: 4,
         render: () => `
-          <div class="w-full space-y-6 text-center max-w-4xl mx-auto">
+          <div class="w-full space-y-4 sm:space-y-6 text-center max-w-4xl mx-auto py-2">
             <div class="slide-item step-1 space-y-1">
-              <span class="px-3.5 py-1 rounded-full bg-style-green/10 text-style-green text-xs font-bold uppercase tracking-wider">14 | PERSPECTIVES D'AVENIR</span>
-              <h2 class="text-3xl font-extrabold text-style-dark font-display">CONCLUSION</h2>
+              <span class="px-3 sm:px-3.5 py-0.5 sm:py-1 rounded-full bg-style-green/10 text-style-green text-[10px] sm:text-xs font-bold uppercase tracking-wider">14 | PERSPECTIVES D'AVENIR</span>
+              <h2 class="text-2xl sm:text-3xl font-extrabold text-style-dark font-display">CONCLUSION</h2>
             </div>
 
-            <div class="slide-item step-2 bg-white rounded-3xl p-6 border-2 border-style-teal shadow-md">
-              <h3 class="text-2xl sm:text-3xl font-black text-style-dark font-display leading-snug">
+            <div class="slide-item step-2 bg-white rounded-3xl p-4 sm:p-6 border-2 border-style-teal shadow-md">
+              <h3 class="text-xl sm:text-2xl md:text-3xl font-black text-style-dark font-display leading-snug">
                 « La digitalisation transforme progressivement le <span class="text-style-red">système de santé ivoirien</span>. »
               </h3>
             </div>
 
-            <div class="slide-item step-3 grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
-              <div class="capsule-pill pill-red p-3.5 text-white flex items-center space-x-3">
-                <div class="circle-badge text-style-red !w-8 !h-8 !text-xs">1</div>
+            <div class="slide-item step-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 text-left">
+              <div class="capsule-pill pill-red p-3 sm:p-3.5 text-white flex items-center space-x-3">
+                <div class="circle-badge text-style-red !w-7 sm:!w-8 !h-7 sm:!h-8 !text-xs">1</div>
                 <div>
                   <h5 class="text-xs font-black uppercase">Information</h5>
                   <p class="text-[10px] text-white/90">Temps réel</p>
                 </div>
               </div>
 
-              <div class="capsule-pill pill-teal p-3.5 text-white flex items-center space-x-3">
-                <div class="circle-badge text-style-teal !w-8 !h-8 !text-xs">2</div>
+              <div class="capsule-pill pill-teal p-3 sm:p-3.5 text-white flex items-center space-x-3">
+                <div class="circle-badge text-style-teal !w-7 sm:!w-8 !h-7 sm:!h-8 !text-xs">2</div>
                 <div>
                   <h5 class="text-xs font-black uppercase">Soins</h5>
                   <p class="text-[10px] text-white/90">Prise en charge</p>
                 </div>
               </div>
 
-              <div class="capsule-pill pill-orange p-3.5 text-white flex items-center space-x-3">
-                <div class="circle-badge text-style-orange !w-8 !h-8 !text-xs">3</div>
+              <div class="capsule-pill pill-orange p-3 sm:p-3.5 text-white flex items-center space-x-3">
+                <div class="circle-badge text-style-orange !w-7 sm:!w-8 !h-7 sm:!h-8 !text-xs">3</div>
                 <div>
                   <h5 class="text-xs font-black uppercase">Gestion</h5>
                   <p class="text-[10px] text-white/90">Efficience</p>
                 </div>
               </div>
 
-              <div class="capsule-pill pill-green p-3.5 text-white flex items-center space-x-3">
-                <div class="circle-badge text-style-green !w-8 !h-8 !text-xs">4</div>
+              <div class="capsule-pill pill-green p-3 sm:p-3.5 text-white flex items-center space-x-3">
+                <div class="circle-badge text-style-green !w-7 sm:!w-8 !h-7 sm:!h-8 !text-xs">4</div>
                 <div>
                   <h5 class="text-xs font-black uppercase">Décision</h5>
                   <p class="text-[10px] text-white/90">Par la donnée</p>
@@ -1065,7 +1091,7 @@
               </div>
             </div>
 
-            <div class="slide-item step-4 capsule-pill pill-dark py-3 px-6 text-sm font-bold text-white shadow-md">
+            <div class="slide-item step-4 capsule-pill pill-dark py-2.5 sm:py-3 px-4 sm:px-6 text-xs sm:text-sm font-bold text-white shadow-md">
               ✨ La réussite du projet repose sur la contribution et l'engagement de tous les acteurs.
             </div>
           </div>
@@ -1225,6 +1251,36 @@
         renderCurrentSlide();
       }
     });
+
+    // Touch Swipe Gestures for Mobile & Tablet
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchEndX = 0;
+    let touchEndY = 0;
+
+    window.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+      touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+
+    window.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      touchEndY = e.changedTouches[0].screenY;
+      handleSwipe();
+    }, { passive: true });
+
+    function handleSwipe() {
+      const diffX = touchEndX - touchStartX;
+      const diffY = touchEndY - touchStartY;
+      // Only trigger if horizontal swipe is greater than vertical drag
+      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 45) {
+        if (diffX < 0) {
+          nextStep();
+        } else {
+          prevStep();
+        }
+      }
+    }
 
     // Background Canvas Particles
     const canvas = document.getElementById('bg-canvas');
