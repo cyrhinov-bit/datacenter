@@ -2,6 +2,8 @@
 
 Présentation institutionnelle du **Datacenter National de Santé de Côte d'Ivoire**, développé sous l'égide du **Ministère de la Santé, de l'Hygiène Publique et de la Couverture Maladie Universelle (MSHPCMU)** et de la **Direction de l'Informatique et de la Santé Digitale (DISD)**.
 
+🌐 **Lien en ligne (Démo Web interactive)** : [https://cyrhinov-bit.github.io/datacenter/](https://cyrhinov-bit.github.io/datacenter/)
+
 ---
 
 ## 📋 Contenu du Projet
@@ -54,3 +56,4 @@ Le fichier `Presentation_Datacenter_Sante_CI_Style.pptx` sera généré à la ra
 - **Ministère de la Santé, de l'Hygiène Publique et de la Couverture Maladie Universelle (MSHPCMU)**
 - **Direction de l'Informatique et de la Santé Digitale (DISD)**
 - **Présentateur** : M. OUATTARA Yacouba, Sous-Directeur des Infrastructures
+
