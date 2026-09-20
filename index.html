@@ -163,9 +163,12 @@
       </button>
 
       <select id="speed-select" onchange="changeSpeed(this.value)" class="bg-white text-slate-700 border border-slate-300 text-xs rounded-full px-3 py-1.5 outline-none font-semibold cursor-pointer shadow-sm">
-        <option value="1500">Rapide (1.5s)</option>
-        <option value="2500" selected>Normal (2.5s)</option>
-        <option value="4000">Détaillé (4.0s)</option>
+        <option value="1500">1.5s (Très rapide)</option>
+        <option value="2500">2.5s (Rapide)</option>
+        <option value="4000" selected>4.0s (Standard)</option>
+        <option value="6000">6.0s (Modéré)</option>
+        <option value="8000">8.0s (Posé)</option>
+        <option value="10000">10.0s (Détaillé)</option>
       </select>
 
       <span id="slide-indicator" class="px-3.5 py-1 rounded-full text-xs font-mono font-bold bg-style-teal/10 text-style-teal border border-style-teal/30">
@@ -1073,7 +1076,7 @@
     let currentSlideIdx = 0;
     let currentStep = 0;
     let autoPlayInterval = null;
-    let autoPlaySpeed = 2500;
+    let autoPlaySpeed = 4000;
 
     function toggleAutoPlay() {
       const btn = document.getElementById('autoplay-btn');
